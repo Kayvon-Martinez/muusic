@@ -7,6 +7,7 @@ enum ItemType {
   detailAlbum,
   detailTag,
   tagPage,
+  event,
 }
 
 extension ItemTypeExtension on ItemType {
@@ -28,6 +29,8 @@ extension ItemTypeExtension on ItemType {
         return 'DetailTag';
       case ItemType.tagPage:
         return 'TagPage';
+      case ItemType.event:
+        return 'Event';
     }
   }
 }
@@ -51,6 +54,8 @@ extension StringExtension on String {
         return ItemType.detailTag;
       case 'tagPage':
         return ItemType.tagPage;
+      case 'event':
+        return ItemType.event;
       default:
         return ItemType.artist;
     }
@@ -173,6 +178,8 @@ class RawSongSource {
 
 class BaseTrackModel {
   final String name;
+  final int? number;
+  final Duration? duration;
   final String url;
   final String artistUrl;
   final RawSongSource? source;
@@ -184,6 +191,8 @@ class BaseTrackModel {
 
   BaseTrackModel({
     required this.name,
+    this.number,
+    this.duration,
     required this.url,
     required this.artistUrl,
     this.source,
@@ -197,6 +206,10 @@ class BaseTrackModel {
   factory BaseTrackModel.fromJson(Map<String, dynamic> json) {
     return BaseTrackModel(
       name: json['name'],
+      number: int.tryParse(json['number']),
+      duration: json['duration'] != null
+          ? Duration(seconds: int.tryParse(json['duration']) ?? 0)
+          : null,
       url: json['url'],
       artistUrl: json['artistUrl'],
       source: json['source'] != null
@@ -213,6 +226,8 @@ class BaseTrackModel {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
+      'number': number,
+      'duration': duration?.inSeconds,
       'url': url,
       'artistUrl': artistUrl,
       'source': source?.toJson(),
@@ -295,6 +310,7 @@ class TagModel {
 
 enum ExternalLinksType {
   website,
+  appleMusic,
   twitter,
   facebook,
   soundcloud,
@@ -310,6 +326,8 @@ extension ExternalLinksTypeExtension on ExternalLinksType {
     switch (this) {
       case ExternalLinksType.website:
         return 'Website';
+      case ExternalLinksType.appleMusic:
+        return 'Apple Music';
       case ExternalLinksType.twitter:
         return 'Twitter';
       case ExternalLinksType.facebook:
@@ -337,6 +355,8 @@ extension ExternalLinksTypeStringExtension on String {
     switch (toLowerCase()) {
       case 'website':
         return ExternalLinksType.website;
+      case 'apple music':
+        return ExternalLinksType.appleMusic;
       case 'twitter':
         return ExternalLinksType.twitter;
       case 'facebook':
@@ -388,14 +408,14 @@ class ExternalLinksModel {
 class EventModel {
   final DateTime date;
   final String title;
-  final String subtitle;
+  final List<String> performers;
   final String locationName;
   final String location;
 
   EventModel({
     required this.date,
     required this.title,
-    required this.subtitle,
+    required this.performers,
     required this.locationName,
     required this.location,
   });
@@ -404,7 +424,7 @@ class EventModel {
     return EventModel(
       date: DateTime.tryParse(json['date']) ?? DateTime.now(),
       title: json['title'],
-      subtitle: json['subtitle'],
+      performers: (json['performers'] as List).cast<String>(),
       locationName: json['locationName'],
       location: json['location'],
     );
@@ -414,7 +434,7 @@ class EventModel {
     return {
       'date': date.toIso8601String(),
       'title': title,
-      'subtitle': subtitle,
+      'performers': performers,
       'locationName': locationName,
       'location': location,
     };
@@ -437,6 +457,7 @@ class DetailedArtistModel extends BaseArtistModel {
   final String? morePhotosUrl;
   final List<BaseAlbumModel> albums;
   final List<ExternalLinksModel> externalLinks;
+  final String? eventsUrl;
   @override
   final ItemType itemType;
 
@@ -460,6 +481,7 @@ class DetailedArtistModel extends BaseArtistModel {
     this.morePhotosUrl,
     required this.albums,
     required this.externalLinks,
+    this.eventsUrl,
     this.itemType = ItemType.detailArtist,
   }) : super(
           name: name,
@@ -503,6 +525,7 @@ class DetailedArtistModel extends BaseArtistModel {
       externalLinks: (json['externalLinks'] as List)
           .map((e) => ExternalLinksModel.fromJson(e))
           .toList(),
+      eventsUrl: json['eventsUrl'],
       itemType: json['itemType'].toString().itemType,
     );
   }
@@ -529,6 +552,7 @@ class DetailedArtistModel extends BaseArtistModel {
       'morePhotosUrl': morePhotosUrl,
       'albums': albums.map((e) => e.toJson()).toList(),
       'externalLinks': externalLinks.map((e) => e.toJson()).toList(),
+      'eventsUrl': eventsUrl,
       'itemType': itemType.name,
     };
   }
@@ -536,9 +560,7 @@ class DetailedArtistModel extends BaseArtistModel {
 
 class DetailedAlbumModel extends BaseAlbumModel {
   final String? description;
-  final int numberOfTracks;
   final Duration duration;
-  final DateTime? releaseDate;
   final List<BaseTrackModel> tracks;
   final List<TagModel> tags;
   final List<BaseAlbumModel> similarAlbums;
@@ -552,10 +574,11 @@ class DetailedAlbumModel extends BaseAlbumModel {
     required String artistUrl,
     required String imageUrl,
     required String artistName,
+    required int? listeners,
+    required DateTime? releaseDate,
+    required int? numberOfTracks,
     this.description,
-    required this.numberOfTracks,
     required this.duration,
-    this.releaseDate,
     required this.tracks,
     required this.tags,
     required this.similarAlbums,
@@ -567,6 +590,9 @@ class DetailedAlbumModel extends BaseAlbumModel {
           artistUrl: artistUrl,
           imageUrl: imageUrl,
           artistName: artistName,
+          listeners: listeners,
+          releaseDate: releaseDate,
+          numberOfTracks: numberOfTracks,
         );
 
   factory DetailedAlbumModel.fromJson(Map<String, dynamic> json) {
@@ -577,6 +603,7 @@ class DetailedAlbumModel extends BaseAlbumModel {
       imageUrl: json['imageUrl'],
       artistName: json['artist'],
       description: json['description'],
+      listeners: int.tryParse(json['listeners']),
       numberOfTracks: int.tryParse(json['numberOfTracks']) ?? 0,
       duration: Duration(seconds: int.tryParse(json['duration']) ?? 0),
       releaseDate: json['releaseDate'] != null
@@ -605,6 +632,7 @@ class DetailedAlbumModel extends BaseAlbumModel {
       'imageUrl': imageUrl,
       'artistName': artistName,
       'description': description,
+      'listeners': listeners,
       'numberOfTracks': numberOfTracks,
       'duration': duration.inSeconds,
       'releaseDate': releaseDate?.toIso8601String(),

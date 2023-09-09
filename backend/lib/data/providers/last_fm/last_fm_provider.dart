@@ -1,4 +1,4 @@
-import "package:backend/core/utils/last_fm_birth_date_helper.dart";
+import 'package:backend/core/utils/date_helpers.dart';
 import "package:backend/core/values/regex_patterns.dart";
 import "package:backend/data/models/base_models.dart";
 import "package:backend/data/network/dio/dio_client.dart";
@@ -231,7 +231,7 @@ class LastFMProvider {
     int? numberOfTracks;
     if (releaseDateAndNumberOfTracksRaw.length == 2) {
       releaseDate =
-          lastFMBirthDateToDateTime(releaseDateAndNumberOfTracksRaw[0].trim());
+          dateStringSpacesToDateTime(releaseDateAndNumberOfTracksRaw[0].trim());
       numberOfTracks = int.tryParse(releaseDateAndNumberOfTracksRaw[1]
               .trim()
               .replaceFirst("tracks", "")
@@ -247,7 +247,7 @@ class LastFMProvider {
           0;
     } else {
       releaseDate =
-          lastFMBirthDateToDateTime(releaseDateAndNumberOfTracksRaw[0].trim());
+          dateStringSpacesToDateTime(releaseDateAndNumberOfTracksRaw[0].trim());
     }
     return BaseAlbumModel(
       name: name,
@@ -359,16 +359,16 @@ class LastFMProvider {
     String? bornWhere;
     DateTime? diedWhen;
     if (whenAndWheresRaw.length >= 2) {
-      bornWhen = lastFMBirthDateToDateTime(
+      bornWhen = dateStringSpacesToDateTime(
           whenAndWheresRaw[0].text.trim().split("(")[0]);
       bornWhere = whenAndWheresRaw[1].text.trim();
       if (whenAndWheresRaw.length == 3) {
-        diedWhen = lastFMBirthDateToDateTime(
+        diedWhen = dateStringSpacesToDateTime(
             whenAndWheresRaw[2].text.trim().split("(")[0]);
       }
     }
     List<TagModel> tags = [];
-    for (var element in soup.findAll(".tags-list > li")) {
+    for (var element in soup.find("ul.tags-list")!.findAll("li")) {
       tags.add(_parseTagBox(element));
     }
     List<BaseTrackModel> topTracks = [];
@@ -403,12 +403,32 @@ class LastFMProvider {
       albums.add(_parseAlbumSquareDetailScreen(element, url, name));
     }
     List<ExternalLinksModel> externalLinks = [];
-    for (var element in soup.findAll("ul.resource-external-links > li > a")) {
+    for (var element
+        in soup.find("ul.resource-external-links")!.findAll("li > a")) {
       externalLinks.add(ExternalLinksModel(
-        type: element.text.trim().externalLinksType,
+        type: element.text.split("(")[0].trim().externalLinksType,
         url: element.attributes["href"]!.trim(),
       ));
     }
+    var eventsUrl = soup
+                .findAll(
+                    "section.section-with-control > div > p.more-link-with-action")
+                .last
+                .findAll("a")
+                .last
+                .attributes["href"]
+                ?.trim() !=
+            null
+        ? baseUrl +
+            soup
+                .findAll(
+                    "section.section-with-control > div > p.more-link-with-action")
+                .last
+                .findAll("a")
+                .last
+                .attributes["href"]!
+                .trim()
+        : null;
     return DetailedArtistModel(
       name: name,
       url: url,
@@ -428,6 +448,162 @@ class LastFMProvider {
       photoUrls: photoUrls,
       morePhotosUrl: morePhotosUrl,
       albums: albums,
+      externalLinks: externalLinks,
+      eventsUrl: eventsUrl,
+    );
+  }
+
+  BaseTrackModel _parseAlbumPageTrackListItem(Bs4Element element,
+      String artistUrl, String imageUrl, String artistName, String albumName) {
+    var name = element.find("td.chartlist-name > a")?.text ?? "Unknown";
+    var number =
+        int.tryParse(element.find("td.chartlist-index")?.text.trim() ?? "fail");
+    Duration? duration = durationStringColonsToDuration(
+        element.find("td.chartlist-duration")?.text.trim());
+    var url = baseUrl +
+        element.find("td.chartlist-name > a")!.attributes["href"]!.trim();
+    var sourceUrl =
+        element.find("td.chartlist-play > a")?.attributes["href"]?.trim();
+    String extractorUrl = "/api/v1/last_fm/extractor";
+    RawSongSource? source = sourceUrl != null
+        ? RawSongSource(
+            url: sourceUrl,
+            extractorUrl: extractorUrl,
+          )
+        : null;
+    var listeners = int.tryParse(element
+            .find("span.chartlist-count-bar-value")
+            ?.text
+            .replaceAll(",", "")
+            .replaceFirst("listeners", "")
+            .trim() ??
+        "fail");
+    return BaseTrackModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      source: source,
+      imageUrl: imageUrl,
+      artistName: artistName,
+      albumName: albumName,
+      listeners: listeners,
+      number: number,
+      duration: duration,
+    );
+  }
+
+  BaseAlbumModel _parseAlbumPageSimilarAlbumSquare(Bs4Element element) {
+    var name = element.find("a.link-block-target")?.text.trim() ?? "Unknown";
+    var url = baseUrl +
+        element.find("a.link-block-target")!.attributes["href"]!.trim();
+    var artistUrl = baseUrl +
+        element
+            .find("span", attrs: {"itemprop": "name"})!
+            .find("a")!
+            .attributes["href"]!
+            .trim();
+    var imageUrl = element.find(".cover-art > img")!.attributes["src"]!.trim();
+    var artistName = element
+        .find("span", attrs: {"itemprop": "name"})!
+        .find("a")!
+        .text
+        .trim();
+    var listeners = int.tryParse(element
+            .find("p.similar-albums-item-listeners")
+            ?.text
+            .replaceFirst("listeners", "")
+            .trim()
+            .replaceAll(",", "") ??
+        "fail");
+    return BaseAlbumModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      imageUrl: imageUrl,
+      artistName: artistName,
+      listeners: listeners,
+    );
+  }
+
+  // @override
+  Future<DetailedAlbumModel> getAlbum(String url) async {
+    var response = await DioClient().client.get(Uri.decodeComponent(url));
+    var soup = BeautifulSoup(response.data);
+    var name = soup.find(".header-new-title")?.text ?? "Unknown";
+    var artistUrl =
+        baseUrl + soup.find("a.header-new-crumb")!.attributes["href"]!;
+    var imageUrl = soup.find("a.cover-art > img")!.attributes["src"]!.trim();
+    var artistName = soup.find(".header-new-crumb > span")?.text ?? "Unknown";
+    var listeners = int.tryParse(soup
+                .find(".header-metadata-tnew-display > p > abbr")
+                ?.attributes["title"]
+                ?.replaceAll(",", "")
+                .trim() ??
+            "fail") ??
+        0;
+    var releaseDate = dateStringSpacesToDateTime(
+        soup.findAll("div.metadata-column > dl > dd").last.text.trim());
+    var numberOfTracks = int.tryParse(soup
+            .findAll("div.metadata-column > dl > dd")[
+                soup.findAll("div.metadata-column > dl > dd").length - 2]
+            .text
+            .split("track")[0]
+            .trim()) ??
+        0;
+    var description = soup
+        .findAll("div.wiki-block")
+        .last
+        .text
+        .replaceFirst("read more", "")
+        .replaceAll("\n", "")
+        .replaceAll("\t", "")
+        .replaceAll("\r", "")
+        .replaceAll('\\"', "")
+        .replaceFirst("View wiki", "")
+        .replaceAll("  ", " ")
+        .trim();
+    Duration duration = durationStringColonsToDuration(soup
+        .findAll("div.metadata-column > dl > dd")[
+            soup.findAll("div.metadata-column > dl > dd").length - 2]
+        .text
+        .split(",")[1]
+        .trim());
+    List<BaseTrackModel> tracks = [];
+    for (var element in soup.findAll("tr.chartlist-row")) {
+      tracks.add(_parseAlbumPageTrackListItem(
+          element, artistUrl, imageUrl, artistName, name));
+    }
+    List<TagModel> tags = [];
+    for (var element in soup.find("ul.tags-list")!.findAll("li")) {
+      tags.add(_parseTagBox(element));
+    }
+    List<BaseAlbumModel> similarAlbums = [];
+    for (var element in soup.findAll(
+        "ol.similar-albums--with-12 > li.similar-albums-item-wrap > div")) {
+      similarAlbums.add(_parseAlbumPageSimilarAlbumSquare(element));
+    }
+    List<ExternalLinksModel> externalLinks = [];
+    for (var element
+        in soup.find("ul.resource-external-links")!.findAll("li > a")) {
+      externalLinks.add(ExternalLinksModel(
+        type: element.text.split("(")[0].trim().externalLinksType,
+        url: element.attributes["href"]!.trim(),
+      ));
+    }
+    return DetailedAlbumModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      imageUrl: imageUrl,
+      artistName: artistName,
+      listeners: listeners,
+      releaseDate: releaseDate,
+      numberOfTracks: numberOfTracks,
+      description: description,
+      duration: duration,
+      tracks: tracks,
+      tags: tags,
+      similarAlbums: similarAlbums,
       externalLinks: externalLinks,
     );
   }

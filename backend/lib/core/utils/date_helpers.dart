@@ -31,11 +31,11 @@ int _monthToNumber(String month) {
   }
 }
 
-DateTime? lastFMBirthDateToDateTime(String lastFMBirthDate) {
-  if (lastFMBirthDate == "Unknown") {
+DateTime? dateStringSpacesToDateTime(String? dateString) {
+  if (dateString == "Unknown" || dateString == null) {
     return null;
   }
-  var dateMatch = birthDateRegExp.firstMatch(lastFMBirthDate);
+  var dateMatch = birthDateRegExp.firstMatch(dateString);
   if (dateMatch == null) {
     return null;
   }
@@ -50,4 +50,29 @@ DateTime? lastFMBirthDateToDateTime(String lastFMBirthDate) {
     return null;
   }
   return DateTime(year, monthNumber, day);
+}
+
+Duration durationStringColonsToDuration(String? durationString) {
+  if (durationString == null) {
+    return Duration.zero;
+  }
+  var durationItems = durationString.split(":");
+  if (durationItems.length == 1) {
+    return Duration(
+      seconds: int.tryParse(durationItems[0]) ?? 0,
+    );
+  } else if (durationItems.length == 2) {
+    return Duration(
+      minutes: int.tryParse(durationItems[0]) ?? 0,
+      seconds: int.tryParse(durationItems[1]) ?? 0,
+    );
+  } else if (durationItems.length == 3) {
+    return Duration(
+      hours: int.tryParse(durationItems[0]) ?? 0,
+      minutes: int.tryParse(durationItems[1]) ?? 0,
+      seconds: int.tryParse(durationItems[2]) ?? 0,
+    );
+  } else {
+    return Duration.zero;
+  }
 }

@@ -36,14 +36,34 @@ Future<void> start(
     }
   });
 
-  app.get('$apiPath/:id/details/artist/:url', (req, res) async {
+  app.post('$apiPath/:id/details/artist', (req, res) async {
     res.headers.contentType = ContentType.json;
     res.headers.add('Access-Control-Allow-Origin', '*');
     var provider = detectSource(req.params['id']);
-    print(req.params['url']);
-    print(provider);
+    var body = await req.bodyAsJsonMap;
+    if (body['url'] == null) {
+      res.json({'error': 'No url provided'});
+      return;
+    }
     if (provider != null) {
-      var results = await provider.getArtist(req.params['url']);
+      var results = await provider.getArtist(body['url']);
+      res.json(results.toJson());
+    } else {
+      res.json({'error': 'Provider not found'});
+    }
+  });
+
+  app.post("$apiPath/:id/details/album", (req, res) async {
+    res.headers.contentType = ContentType.json;
+    res.headers.add('Access-Control-Allow-Origin', '*');
+    var provider = detectSource(req.params['id']);
+    var body = await req.bodyAsJsonMap;
+    if (body['url'] == null) {
+      res.json({'error': 'No url provided'});
+      return;
+    }
+    if (provider != null) {
+      var results = await provider.getAlbum(body['url']);
       res.json(results.toJson());
     } else {
       res.json({'error': 'Provider not found'});

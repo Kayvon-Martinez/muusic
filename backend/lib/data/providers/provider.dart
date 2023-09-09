@@ -12,5 +12,6 @@ abstract class Provider {
   Future<List<BaseArtistModel>> getTagArtists(String url);
   Future<List<BaseAlbumModel>> getTagAlbums(String url);
   Future<List<BaseTrackModel>> getTagTracks(String url);
+  Future<List<EventModel>> getEvents(String url);
   Future<String> extractor(String url);
 }
