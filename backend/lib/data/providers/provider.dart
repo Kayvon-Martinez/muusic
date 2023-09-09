@@ -8,6 +8,7 @@ abstract class Provider {
   Future<SearchResultsModel> search(String query);
   Future<DetailedArtistModel> getArtist(String url);
   Future<DetailedAlbumModel> getAlbum(String url);
+  Future<DetailedTrackModel> getTrack(String url);
   Future<TagPageModel> getTag(String url);
   Future<List<BaseArtistModel>> getTagArtists(String url);
   Future<List<BaseAlbumModel>> getTagAlbums(String url);

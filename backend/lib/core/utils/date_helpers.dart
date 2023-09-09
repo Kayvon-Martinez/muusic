@@ -35,7 +35,7 @@ DateTime? dateStringSpacesToDateTime(String? dateString) {
   if (dateString == "Unknown" || dateString == null) {
     return null;
   }
-  var dateMatch = birthDateRegExp.firstMatch(dateString);
+  var dateMatch = dateRegExp.firstMatch(dateString);
   if (dateMatch == null) {
     return null;
   }

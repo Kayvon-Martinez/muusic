@@ -310,7 +310,6 @@ class TagModel {
 
 enum ExternalLinksType {
   website,
-  appleMusic,
   twitter,
   facebook,
   soundcloud,
@@ -319,6 +318,7 @@ enum ExternalLinksType {
   spotify,
   bandcamp,
   artimage,
+  appleMusic,
 }
 
 extension ExternalLinksTypeExtension on ExternalLinksType {
@@ -641,6 +641,109 @@ class DetailedAlbumModel extends BaseAlbumModel {
       'similarAlbums': similarAlbums.map((e) => e.toJson()).toList(),
       'externalLinks': externalLinks.map((e) => e.toJson()).toList(),
       'itemType': itemType.name,
+    };
+  }
+}
+
+class DetailedTrackModel extends BaseTrackModel {
+  final String description;
+  final List<TagModel> tags;
+  final String? lyricsUrl;
+  final List<BaseAlbumModel> featuredOnAlbums;
+  final List<BaseTrackModel> similarTracks;
+  final List<ExternalLinksModel> playLinks;
+  final List<ExternalLinksModel> externalLinks;
+  final List<BaseArtistModel> similarArtists;
+
+  DetailedTrackModel({
+    required String name,
+    int? number,
+    Duration? duration,
+    required String url,
+    required String artistUrl,
+    RawSongSource? source,
+    required String imageUrl,
+    required String artistName,
+    String? albumName,
+    int? listeners,
+    required this.description,
+    this.tags = const [],
+    this.lyricsUrl,
+    this.featuredOnAlbums = const [],
+    this.similarTracks = const [],
+    this.playLinks = const [],
+    this.externalLinks = const [],
+    this.similarArtists = const [],
+  }) : super(
+          name: name,
+          number: number,
+          duration: duration,
+          url: url,
+          artistUrl: artistUrl,
+          source: source,
+          imageUrl: imageUrl,
+          artistName: artistName,
+          albumName: albumName,
+          listeners: listeners,
+        );
+
+  factory DetailedTrackModel.fromJson(Map<String, dynamic> json) {
+    return DetailedTrackModel(
+      name: json['name'],
+      number: int.tryParse(json['number']),
+      duration: json['duration'] != null
+          ? Duration(seconds: int.tryParse(json['duration']) ?? 0)
+          : null,
+      url: json['url'],
+      artistUrl: json['artistUrl'],
+      source: json['source'] != null
+          ? RawSongSource.fromJson(json['source'])
+          : null,
+      imageUrl: json['imageUrl'],
+      artistName: json['artistName'],
+      albumName: json['albumName'],
+      listeners: int.tryParse(json['listeners']),
+      description: json['description'],
+      tags: (json['tags'] as List).map((e) => TagModel.fromJson(e)).toList(),
+      lyricsUrl: json['lyricsUrl'],
+      featuredOnAlbums: (json['featuredOnAlbums'] as List)
+          .map((e) => BaseAlbumModel.fromJson(e))
+          .toList(),
+      similarTracks: (json['similarTracks'] as List)
+          .map((e) => BaseTrackModel.fromJson(e))
+          .toList(),
+      playLinks: (json['playLinks'] as List)
+          .map((e) => ExternalLinksModel.fromJson(e))
+          .toList(),
+      externalLinks: (json['externalLinks'] as List)
+          .map((e) => ExternalLinksModel.fromJson(e))
+          .toList(),
+      similarArtists: (json['similarArtists'] as List)
+          .map((e) => BaseArtistModel.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'number': number,
+      'duration': duration?.inSeconds,
+      'url': url,
+      'artistUrl': artistUrl,
+      'source': source?.toJson(),
+      'imageUrl': imageUrl,
+      'artistName': artistName,
+      'albumName': albumName,
+      'listeners': listeners,
+      'description': description,
+      'tags': tags.map((e) => e.toJson()).toList(),
+      'lyricsUrl': lyricsUrl,
+      'featuredOnAlbums': featuredOnAlbums.map((e) => e.toJson()).toList(),
+      'similarTracks': similarTracks.map((e) => e.toJson()).toList(),
+      'playLinks': playLinks.map((e) => e.toJson()).toList(),
+      'externalLinks': externalLinks.map((e) => e.toJson()).toList(),
+      'similarArtists': similarArtists.map((e) => e.toJson()).toList(),
     };
   }
 }

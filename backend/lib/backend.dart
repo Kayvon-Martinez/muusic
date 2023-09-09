@@ -70,6 +70,23 @@ Future<void> start(
     }
   });
 
+  app.post("$apiPath/:id/details/track", (req, res) async {
+    res.headers.contentType = ContentType.json;
+    res.headers.add('Access-Control-Allow-Origin', '*');
+    var provider = detectSource(req.params['id']);
+    var body = await req.bodyAsJsonMap;
+    if (body['url'] == null) {
+      res.json({'error': 'No url provided'});
+      return;
+    }
+    if (provider != null) {
+      var results = await provider.getTrack(body['url']);
+      res.json(results.toJson());
+    } else {
+      res.json({'error': 'Provider not found'});
+    }
+  });
+
   await app.listen(
     port,
     bindIp,

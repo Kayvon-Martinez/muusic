@@ -3,22 +3,21 @@ import "package:backend/core/values/regex_patterns.dart";
 import "package:backend/data/models/base_models.dart";
 import "package:backend/data/network/dio/dio_client.dart";
 
-// import "../provider.dart";
-
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 
-class LastFMProvider {
-  // implements Provider {
-  // @override
+import "../provider.dart";
+
+class LastFMProvider implements Provider {
+  @override
   String get id => "last_fm";
 
-  // @override
+  @override
   String get name => "Last.fm";
 
-  // @override
+  @override
   String get baseUrl => "https://www.last.fm";
 
-  // @override
+  @override
   String get description =>
       "Last.fm was founded in 2002 by Felix Miller, Martin Stiksel, Michael Breidenbruecker and Thomas Willomitzer, all of them from Germany or Austria, as an Internet radio station and music community site, using similar music profiles to generate dynamic playlists.";
 
@@ -79,7 +78,7 @@ class LastFMProvider {
   BaseTrackModel _parseTrackSquare(Bs4Element element) {
     var name = element.find("td.chartlist-name > a")?.text ?? "Unknown";
     var url = baseUrl +
-        element.find("td.chartlist-name > a")!.attributes["href"]!.trim();
+        element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
     var artistUrl = baseUrl +
         element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
     var sourceUrl =
@@ -106,7 +105,7 @@ class LastFMProvider {
     );
   }
 
-  // @override
+  @override
   Future<SearchResultsModel> search(String query) async {
     var response = await DioClient().client.get(
       "$baseUrl/search",
@@ -233,8 +232,6 @@ class LastFMProvider {
       releaseDate =
           dateStringSpacesToDateTime(releaseDateAndNumberOfTracksRaw[0].trim());
       numberOfTracks = int.tryParse(releaseDateAndNumberOfTracksRaw[1]
-              .trim()
-              .replaceFirst("tracks", "")
               .replaceFirst("track", "")
               .trim()) ??
           0;
@@ -261,7 +258,7 @@ class LastFMProvider {
     );
   }
 
-  // @override
+  @override
   Future<DetailedArtistModel> getArtist(String url) async {
     var response = await DioClient().client.get(Uri.decodeComponent(url));
     var soup = BeautifulSoup(response.data);
@@ -496,12 +493,8 @@ class LastFMProvider {
     var name = element.find("a.link-block-target")?.text.trim() ?? "Unknown";
     var url = baseUrl +
         element.find("a.link-block-target")!.attributes["href"]!.trim();
-    var artistUrl = baseUrl +
-        element
-            .find("span", attrs: {"itemprop": "name"})!
-            .find("a")!
-            .attributes["href"]!
-            .trim();
+    var artistUrl =
+        url.split("/").sublist(0, url.split("/").length - 1).join("/");
     var imageUrl = element.find(".cover-art > img")!.attributes["src"]!.trim();
     var artistName = element
         .find("span", attrs: {"itemprop": "name"})!
@@ -525,7 +518,7 @@ class LastFMProvider {
     );
   }
 
-  // @override
+  @override
   Future<DetailedAlbumModel> getAlbum(String url) async {
     var response = await DioClient().client.get(Uri.decodeComponent(url));
     var soup = BeautifulSoup(response.data);
@@ -593,18 +586,244 @@ class LastFMProvider {
     return DetailedAlbumModel(
       name: name,
       url: url,
-      artistUrl: artistUrl,
-      imageUrl: imageUrl,
       artistName: artistName,
       listeners: listeners,
       releaseDate: releaseDate,
-      numberOfTracks: numberOfTracks,
-      description: description,
       duration: duration,
       tracks: tracks,
       tags: tags,
       similarAlbums: similarAlbums,
       externalLinks: externalLinks,
+      imageUrl: imageUrl,
+      artistUrl: artistUrl,
+      description: description,
+      numberOfTracks: numberOfTracks,
     );
+  }
+
+  BaseAlbumModel _parseTrackPageSimilarAlbumSquare(Bs4Element element) {
+    var name = element.find("a.link-block-target")?.text.trim() ?? "Unknown";
+    var url = baseUrl +
+        element.find("a.link-block-target")!.attributes["href"]!.trim();
+    var artistUrl =
+        url.split("/").sublist(0, url.split("/").length - 1).join("/");
+    var imageUrl = element.find(".cover-art > img")!.attributes["src"]!.trim();
+    var artistName = element
+        .find("span", attrs: {"itemprop": "name"})!
+        .find("a")!
+        .text
+        .trim();
+    var listeners = int.tryParse(element
+            .find("p.similar-albums-item-listeners")
+            ?.text
+            .replaceFirst("listeners", "")
+            .trim()
+            .replaceAll(",", "") ??
+        "fail");
+    return BaseAlbumModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      imageUrl: imageUrl,
+      artistName: artistName,
+      listeners: listeners,
+    );
+  }
+
+  BaseTrackModel _parseTrackPageSimilarTrackSquare(Bs4Element element) {
+    var name = element.find("a.link-block-target")?.text.trim() ?? "Unknown";
+    var url = baseUrl +
+        element.find("a.link-block-target")!.attributes["href"]!.trim();
+    var artistUrl = baseUrl +
+        element
+            .find("span", attrs: {"itemprop": "name"})!
+            .find("a")!
+            .attributes["href"]!
+            .trim();
+    var sourceUrl = element
+        .find("a.track-similar-tracks-item-playlink")
+        ?.attributes["href"]
+        ?.trim();
+    String extractorUrl = "/api/v1/last_fm/extractor";
+    RawSongSource? source = sourceUrl != null
+        ? RawSongSource(
+            url: sourceUrl,
+            extractorUrl: extractorUrl,
+          )
+        : null;
+    var imageUrl = element.find(".cover-art > img")!.attributes["src"]!.trim();
+    var artistName = element
+        .find("span", attrs: {"itemprop": "name"})!
+        .find("a")!
+        .text
+        .trim();
+    return BaseTrackModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      source: source,
+      imageUrl: imageUrl,
+      artistName: artistName,
+    );
+  }
+
+  BaseArtistModel _parseTrackPageSimilarArtist(Bs4Element element) {
+    var name = element.find("a.link-block-target")?.text ?? "Unknown";
+    var url = baseUrl +
+        element.find("a.link-block-target")!.attributes["href"]!.trim();
+    var imageUrl = element.find(".avatar > img")!.attributes["src"]!.trim();
+    var listeners = int.tryParse(element
+            .find("p.catalogue-overview-similar-artists-item-listeners")
+            ?.text
+            .replaceFirst("listeners", "")
+            .trim()
+            .replaceAll(",", "") ??
+        "fail");
+    return BaseArtistModel(
+      name: name,
+      url: url,
+      imageUrl: imageUrl,
+      listeners: listeners,
+    );
+  }
+
+  @override
+  Future<DetailedTrackModel> getTrack(String url) async {
+    var response = await DioClient().client.get(Uri.decodeComponent(url));
+    var soup = BeautifulSoup(response.data);
+    var name = soup.find(".header-new-title")?.text ?? "Unknown";
+    Duration? duration = durationStringColonsToDuration(
+        soup.find("dl.catalogue-metadata > dd")?.text.trim());
+    var artistUrl =
+        url.split("/").sublist(0, url.split("/").length - 2).join("/");
+    var sourceUrl =
+        soup.find("a.header-new-playlink")?.attributes["href"]?.trim();
+    String extractorUrl = "/api/v1/last_fm/extractor";
+    RawSongSource? source = sourceUrl != null
+        ? RawSongSource(
+            url: sourceUrl,
+            extractorUrl: extractorUrl,
+          )
+        : null;
+    // var imageUrl = soup.find("img.video-preview")?.attributes["src"]?.trim();
+    String imageUrl = "";
+    var artistName =
+        soup.find("span", attrs: {"itemprop": "name"})?.text ?? "Unknown";
+    String? albumName;
+    var listeners = int.tryParse(soup
+                .find(".header-metadata-tnew-display > p > abbr")
+                ?.attributes["title"]
+                ?.replaceAll(",", "")
+                .trim() ??
+            "fail") ??
+        0;
+    var description = soup
+        .find(
+            "div.wiki-block > div.wiki-block-inner > div.wiki-truncate-4-lines")!
+        .text
+        .replaceFirst("read more", "")
+        .replaceAll("\n", "")
+        .replaceAll("\t", "")
+        .replaceAll("\r", "")
+        .replaceAll('\\"', "")
+        .replaceFirst("View wiki", "")
+        .replaceAll("  ", " ")
+        .trim();
+    List<TagModel> tags = [];
+    for (var element in soup.find("ul.tags-list")!.findAll("li")) {
+      tags.add(_parseTagBox(element));
+    }
+    String? lyricsUrl = soup
+                .find("dd.catalogue-metadata-description > p > a")
+                ?.attributes["href"]
+                ?.trim() !=
+            null
+        ? baseUrl +
+            soup
+                .find("dd.catalogue-metadata-description > p > a")!
+                .attributes["href"]!
+                .trim()
+        : null;
+    List<BaseAlbumModel> featuredOnAlbums = [];
+    for (var element in soup.findAll("div.album-and-lyrics-row > section")) {
+      featuredOnAlbums.add(_parseTrackPageSimilarAlbumSquare(element));
+    }
+    imageUrl = featuredOnAlbums.first.imageUrl;
+    albumName = featuredOnAlbums.first.name;
+    List<BaseTrackModel> similarTracks = [];
+    for (var element
+        in soup.findAll("ol.track-similar-tracks--with-6 > li > div")) {
+      similarTracks.add(_parseTrackPageSimilarTrackSquare(element));
+    }
+    List<ExternalLinksModel> playLinks = [];
+    for (var element
+        in soup.findAll("ul.play-this-track-playlinks").last.findAll("li")) {
+      playLinks.add(ExternalLinksModel(
+        type: element.find("a")!.text.split("(")[0].trim().externalLinksType,
+        url: element.find("a")!.attributes["href"]!.trim(),
+      ));
+    }
+    List<ExternalLinksModel> externalLinks = [];
+    for (var element
+        in soup.find("ul.resource-external-links")!.findAll("li > a")) {
+      externalLinks.add(ExternalLinksModel(
+        type: element.text.split("(")[0].trim().externalLinksType,
+        url: element.attributes["href"]!.trim(),
+      ));
+    }
+    List<BaseArtistModel> similarArtists = [];
+    for (var element in soup.findAll(
+        "ol.catalogue-overview-similar-artists--with-6 > li.catalogue-overview-similar-artists-item-wrap > div")) {
+      similarArtists.add(_parseTrackPageSimilarArtist(element));
+    }
+    return DetailedTrackModel(
+      name: name,
+      url: url,
+      artistName: artistName,
+      listeners: listeners,
+      duration: duration,
+      source: source,
+      imageUrl: imageUrl,
+      artistUrl: artistUrl,
+      albumName: albumName,
+      description: description,
+      tags: tags,
+      lyricsUrl: lyricsUrl,
+      featuredOnAlbums: featuredOnAlbums,
+      similarTracks: similarTracks,
+      playLinks: playLinks,
+      externalLinks: externalLinks,
+      similarArtists: similarArtists,
+    );
+  }
+
+  @override
+  Future<TagPageModel> getTag(String url) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<BaseArtistModel>> getTagArtists(String url) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<BaseAlbumModel>> getTagAlbums(String url) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<BaseTrackModel>> getTagTracks(String url) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<EventModel>> getEvents(String url) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> extractor(String url) async {
+    throw UnimplementedError();
   }
 }
