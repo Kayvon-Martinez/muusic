@@ -36,6 +36,20 @@ Future<void> start(
     }
   });
 
+  app.get('$apiPath/:id/details/artist/:url', (req, res) async {
+    res.headers.contentType = ContentType.json;
+    res.headers.add('Access-Control-Allow-Origin', '*');
+    var provider = detectSource(req.params['id']);
+    print(req.params['url']);
+    print(provider);
+    if (provider != null) {
+      var results = await provider.getArtist(req.params['url']);
+      res.json(results.toJson());
+    } else {
+      res.json({'error': 'Provider not found'});
+    }
+  });
+
   await app.listen(
     port,
     bindIp,

@@ -100,6 +100,9 @@ class BaseAlbumModel {
   final String imageUrl;
   final String artistName;
   final ItemType itemType;
+  final int? listeners;
+  final DateTime? releaseDate;
+  final int? numberOfTracks;
 
   BaseAlbumModel({
     required this.name,
@@ -107,6 +110,9 @@ class BaseAlbumModel {
     required this.artistUrl,
     required this.imageUrl,
     required this.artistName,
+    this.listeners,
+    this.releaseDate,
+    this.numberOfTracks,
     this.itemType = ItemType.album,
   });
 
@@ -117,6 +123,11 @@ class BaseAlbumModel {
       artistUrl: json['artistUrl'],
       imageUrl: json['imageUrl'],
       artistName: json['artist'],
+      listeners: int.tryParse(json['listeners']),
+      releaseDate: json['releaseDate'] != null
+          ? DateTime.tryParse(json['releaseDate'])
+          : null,
+      numberOfTracks: int.tryParse(json['numberOfTracks']),
       itemType: json['itemType'].toString().itemType,
     );
   }
@@ -128,6 +139,9 @@ class BaseAlbumModel {
       'artistUrl': artistUrl,
       'imageUrl': imageUrl,
       'artistName': artistName,
+      'listeners': listeners,
+      'releaseDate': releaseDate?.toIso8601String(),
+      'numberOfTracks': numberOfTracks,
       'itemType': itemType.name,
     };
   }
@@ -348,12 +362,10 @@ extension ExternalLinksTypeStringExtension on String {
 class ExternalLinksModel {
   final ExternalLinksType type;
   final String url;
-  final String iconUrl;
 
   ExternalLinksModel({
     required this.type,
     required this.url,
-    required this.iconUrl,
   });
 
   factory ExternalLinksModel.fromJson(Map<String, dynamic> json) {
@@ -362,7 +374,6 @@ class ExternalLinksModel {
         (e) => e.toString() == 'ExternalLinksType.${json['type']}',
       ),
       url: json['url'],
-      iconUrl: json['iconUrl'],
     );
   }
 
@@ -370,7 +381,6 @@ class ExternalLinksModel {
     return {
       'type': type.name,
       'url': url,
-      'iconUrl': iconUrl,
     };
   }
 }
@@ -427,7 +437,6 @@ class DetailedArtistModel extends BaseArtistModel {
   final String? morePhotosUrl;
   final List<BaseAlbumModel> albums;
   final List<ExternalLinksModel> externalLinks;
-  final List<BaseTrackModel> trendingTracks;
   @override
   final ItemType itemType;
 
@@ -451,7 +460,6 @@ class DetailedArtistModel extends BaseArtistModel {
     this.morePhotosUrl,
     required this.albums,
     required this.externalLinks,
-    required this.trendingTracks,
     this.itemType = ItemType.detailArtist,
   }) : super(
           name: name,
@@ -495,9 +503,6 @@ class DetailedArtistModel extends BaseArtistModel {
       externalLinks: (json['externalLinks'] as List)
           .map((e) => ExternalLinksModel.fromJson(e))
           .toList(),
-      trendingTracks: (json['trendingTracks'] as List)
-          .map((e) => BaseTrackModel.fromJson(e))
-          .toList(),
       itemType: json['itemType'].toString().itemType,
     );
   }
@@ -524,7 +529,6 @@ class DetailedArtistModel extends BaseArtistModel {
       'morePhotosUrl': morePhotosUrl,
       'albums': albums.map((e) => e.toJson()).toList(),
       'externalLinks': externalLinks.map((e) => e.toJson()).toList(),
-      'trendingTracks': trendingTracks.map((e) => e.toJson()).toList(),
       'itemType': itemType.name,
     };
   }
