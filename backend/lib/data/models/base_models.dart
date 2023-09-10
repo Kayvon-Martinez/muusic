@@ -458,8 +458,6 @@ class DetailedArtistModel extends BaseArtistModel {
   final List<BaseAlbumModel> albums;
   final List<ExternalLinksModel> externalLinks;
   final String? eventsUrl;
-  @override
-  final ItemType itemType;
 
   DetailedArtistModel({
     required this.isTouring,
@@ -467,6 +465,7 @@ class DetailedArtistModel extends BaseArtistModel {
     required String url,
     required String imageUrl,
     required int? listeners,
+    ItemType itemType = ItemType.detailArtist,
     this.latestRelease,
     this.popularThisWeek,
     required this.similarArtists,
@@ -482,12 +481,12 @@ class DetailedArtistModel extends BaseArtistModel {
     required this.albums,
     required this.externalLinks,
     this.eventsUrl,
-    this.itemType = ItemType.detailArtist,
   }) : super(
           name: name,
           url: url,
           imageUrl: imageUrl,
           listeners: listeners,
+          itemType: itemType,
         );
 
   factory DetailedArtistModel.fromJson(Map<String, dynamic> json) {
@@ -560,13 +559,11 @@ class DetailedArtistModel extends BaseArtistModel {
 
 class DetailedAlbumModel extends BaseAlbumModel {
   final String? description;
-  final Duration duration;
+  final Duration? duration;
   final List<BaseTrackModel> tracks;
   final List<TagModel> tags;
   final List<BaseAlbumModel> similarAlbums;
   final List<ExternalLinksModel> externalLinks;
-  @override
-  final ItemType itemType;
 
   DetailedAlbumModel({
     required String name,
@@ -577,13 +574,13 @@ class DetailedAlbumModel extends BaseAlbumModel {
     required int? listeners,
     required DateTime? releaseDate,
     required int? numberOfTracks,
+    ItemType itemType = ItemType.detailAlbum,
     this.description,
-    required this.duration,
+    this.duration,
     required this.tracks,
     required this.tags,
     required this.similarAlbums,
     required this.externalLinks,
-    this.itemType = ItemType.detailAlbum,
   }) : super(
           name: name,
           url: url,
@@ -593,6 +590,7 @@ class DetailedAlbumModel extends BaseAlbumModel {
           listeners: listeners,
           releaseDate: releaseDate,
           numberOfTracks: numberOfTracks,
+          itemType: itemType,
         );
 
   factory DetailedAlbumModel.fromJson(Map<String, dynamic> json) {
@@ -605,7 +603,9 @@ class DetailedAlbumModel extends BaseAlbumModel {
       description: json['description'],
       listeners: int.tryParse(json['listeners']),
       numberOfTracks: int.tryParse(json['numberOfTracks']) ?? 0,
-      duration: Duration(seconds: int.tryParse(json['duration']) ?? 0),
+      duration: json['duration'] != null
+          ? Duration(seconds: int.tryParse(json['duration']) ?? 0)
+          : null,
       releaseDate: json['releaseDate'] != null
           ? DateTime.tryParse(json['releaseDate'])
           : null,
@@ -634,7 +634,7 @@ class DetailedAlbumModel extends BaseAlbumModel {
       'description': description,
       'listeners': listeners,
       'numberOfTracks': numberOfTracks,
-      'duration': duration.inSeconds,
+      'duration': duration?.inSeconds,
       'releaseDate': releaseDate?.toIso8601String(),
       'tracks': tracks.map((e) => e.toJson()).toList(),
       'tags': tags.map((e) => e.toJson()).toList(),
@@ -724,6 +724,7 @@ class DetailedTrackModel extends BaseTrackModel {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -750,17 +751,16 @@ class DetailedTrackModel extends BaseTrackModel {
 
 class DetailedTagModel extends TagModel {
   final String imageUrl;
-  @override
-  final ItemType itemType;
 
   DetailedTagModel({
     required String name,
     required String url,
+    ItemType itemType = ItemType.detailTag,
     required this.imageUrl,
-    this.itemType = ItemType.detailTag,
   }) : super(
           name: name,
           url: url,
+          itemType: itemType,
         );
 
   factory DetailedTagModel.fromJson(Map<String, dynamic> json) {
@@ -791,12 +791,11 @@ class TagPageModel extends TagModel {
   final List<BaseTrackModel> topTracks;
   final List<BaseAlbumModel> topAlbums;
   final List<DetailedTagModel> relatedTags;
-  @override
-  final ItemType itemType;
 
   TagPageModel({
     required String name,
     required String url,
+    ItemType itemType = ItemType.tagPage,
     required this.similarTags,
     required this.description,
     required this.topArtists,
@@ -804,10 +803,10 @@ class TagPageModel extends TagModel {
     required this.topTracks,
     required this.topAlbums,
     required this.relatedTags,
-    this.itemType = ItemType.tagPage,
   }) : super(
           name: name,
           url: url,
+          itemType: itemType,
         );
 
   factory TagPageModel.fromJson(Map<String, dynamic> json) {

@@ -21,7 +21,7 @@ Future<void> start(
   app.get('$apiPath/', (req, res) {
     res.headers.contentType = ContentType.json;
     res.headers.add('Access-Control-Allow-Origin', '*');
-    res.json({'message': 'Hello World!'});
+    res.json({'message': 'Welcome to the backend'});
   });
 
   app.get('$apiPath/:id/search/:query', (req, res) async {

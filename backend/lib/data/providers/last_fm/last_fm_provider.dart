@@ -339,18 +339,23 @@ class LastFMProvider implements Provider {
         .findAll(".catalogue-overview-similar-artists-full-width > li > div")) {
       similarArtists.add(_parseSimilarArtist(element));
     }
-    var bio = soup
-        .findAll("div.wiki-block")
-        .last
-        .text
-        .replaceFirst("read more", "")
-        .replaceAll("\n", "")
-        .replaceAll("\t", "")
-        .replaceAll("\r", "")
-        .replaceAll('\\"', "")
-        .replaceFirst("View wiki", "")
-        .replaceAll("  ", " ")
-        .trim();
+    String bio = "";
+    try {
+      bio = soup
+          .findAll("div.wiki-block")
+          .last
+          .text
+          .replaceFirst("read more", "")
+          .replaceAll("\n", "")
+          .replaceAll("\t", "")
+          .replaceAll("\r", "")
+          .replaceAll('\\"', "")
+          .replaceFirst("View wiki", "")
+          .replaceAll("  ", " ")
+          .trim();
+    } catch (e) {
+      bio = "No bio available";
+    }
     var whenAndWheresRaw = soup.findAll("dd.catalogue-metadata-description");
     DateTime? bornWhen;
     String? bornWhere;
@@ -365,7 +370,7 @@ class LastFMProvider implements Provider {
       }
     }
     List<TagModel> tags = [];
-    for (var element in soup.find("ul.tags-list")!.findAll("li")) {
+    for (var element in soup.find("ul.tags-list")?.findAll("li") ?? []) {
       tags.add(_parseTagBox(element));
     }
     List<BaseTrackModel> topTracks = [];
@@ -401,9 +406,9 @@ class LastFMProvider implements Provider {
     }
     List<ExternalLinksModel> externalLinks = [];
     for (var element
-        in soup.find("ul.resource-external-links")!.findAll("li > a")) {
+        in soup.find("ul.resource-external-links")?.findAll("li > a") ?? []) {
       externalLinks.add(ExternalLinksModel(
-        type: element.text.split("(")[0].trim().externalLinksType,
+        type: element.text.split("(")[0].trim().toString().externalLinksType,
         url: element.attributes["href"]!.trim(),
       ));
     }
@@ -543,31 +548,41 @@ class LastFMProvider implements Provider {
             .split("track")[0]
             .trim()) ??
         0;
-    var description = soup
-        .findAll("div.wiki-block")
-        .last
-        .text
-        .replaceFirst("read more", "")
-        .replaceAll("\n", "")
-        .replaceAll("\t", "")
-        .replaceAll("\r", "")
-        .replaceAll('\\"', "")
-        .replaceFirst("View wiki", "")
-        .replaceAll("  ", " ")
-        .trim();
-    Duration duration = durationStringColonsToDuration(soup
-        .findAll("div.metadata-column > dl > dd")[
-            soup.findAll("div.metadata-column > dl > dd").length - 2]
-        .text
-        .split(",")[1]
-        .trim());
+    String description = "";
+    try {
+      description = soup
+          .findAll("div.wiki-block")
+          .last
+          .text
+          .replaceFirst("read more", "")
+          .replaceAll("\n", "")
+          .replaceAll("\t", "")
+          .replaceAll("\r", "")
+          .replaceAll('\\"', "")
+          .replaceFirst("View wiki", "")
+          .replaceAll("  ", " ")
+          .trim();
+    } catch (e) {
+      description = "No description available";
+    }
+    Duration? duration;
+    try {
+      duration = durationStringColonsToDuration(soup
+          .findAll("div.metadata-column > dl > dd")[
+              soup.findAll("div.metadata-column > dl > dd").length - 2]
+          .text
+          .split(",")[1]
+          .trim());
+    } catch (e) {
+      duration = null;
+    }
     List<BaseTrackModel> tracks = [];
     for (var element in soup.findAll("tr.chartlist-row")) {
       tracks.add(_parseAlbumPageTrackListItem(
           element, artistUrl, imageUrl, artistName, name));
     }
     List<TagModel> tags = [];
-    for (var element in soup.find("ul.tags-list")!.findAll("li")) {
+    for (var element in soup.find("ul.tags-list")?.findAll("li") ?? []) {
       tags.add(_parseTagBox(element));
     }
     List<BaseAlbumModel> similarAlbums = [];
@@ -577,9 +592,9 @@ class LastFMProvider implements Provider {
     }
     List<ExternalLinksModel> externalLinks = [];
     for (var element
-        in soup.find("ul.resource-external-links")!.findAll("li > a")) {
+        in soup.find("ul.resource-external-links")?.findAll("li > a") ?? []) {
       externalLinks.add(ExternalLinksModel(
-        type: element.text.split("(")[0].trim().externalLinksType,
+        type: element.text.split("(")[0].trim().toString().externalLinksType,
         url: element.attributes["href"]!.trim(),
       ));
     }
@@ -717,18 +732,23 @@ class LastFMProvider implements Provider {
                 .trim() ??
             "fail") ??
         0;
-    var description = soup
-        .find(
-            "div.wiki-block > div.wiki-block-inner > div.wiki-truncate-4-lines")!
-        .text
-        .replaceFirst("read more", "")
-        .replaceAll("\n", "")
-        .replaceAll("\t", "")
-        .replaceAll("\r", "")
-        .replaceAll('\\"', "")
-        .replaceFirst("View wiki", "")
-        .replaceAll("  ", " ")
-        .trim();
+    String description = "";
+    try {
+      description = soup
+          .find(
+              "div.wiki-block > div.wiki-block-inner > div.wiki-truncate-4-lines")!
+          .text
+          .replaceFirst("read more", "")
+          .replaceAll("\n", "")
+          .replaceAll("\t", "")
+          .replaceAll("\r", "")
+          .replaceAll('\\"', "")
+          .replaceFirst("View wiki", "")
+          .replaceAll("  ", " ")
+          .trim();
+    } catch (e) {
+      description = "No description available";
+    }
     List<TagModel> tags = [];
     for (var element in soup.find("ul.tags-list")!.findAll("li")) {
       tags.add(_parseTagBox(element));
@@ -763,15 +783,21 @@ class LastFMProvider implements Provider {
     for (var element
         in soup.findAll("ul.play-this-track-playlinks").last.findAll("li")) {
       playLinks.add(ExternalLinksModel(
-        type: element.find("a")!.text.split("(")[0].trim().externalLinksType,
+        type: element
+            .find("a")!
+            .text
+            .split("(")[0]
+            .trim()
+            .toString()
+            .externalLinksType,
         url: element.find("a")!.attributes["href"]!.trim(),
       ));
     }
     List<ExternalLinksModel> externalLinks = [];
     for (var element
-        in soup.find("ul.resource-external-links")!.findAll("li > a")) {
+        in soup.find("ul.resource-external-links")?.findAll("li > a") ?? []) {
       externalLinks.add(ExternalLinksModel(
-        type: element.text.split("(")[0].trim().externalLinksType,
+        type: element.text.split("(")[0].trim().toString().externalLinksType,
         url: element.attributes["href"]!.trim(),
       ));
     }
