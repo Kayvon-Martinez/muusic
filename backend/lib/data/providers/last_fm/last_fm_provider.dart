@@ -746,7 +746,11 @@ class LastFMProvider implements Provider {
         : null;
     List<BaseAlbumModel> featuredOnAlbums = [];
     for (var element in soup.findAll("div.album-and-lyrics-row > section")) {
-      featuredOnAlbums.add(_parseTrackPageSimilarAlbumSquare(element));
+      try {
+        featuredOnAlbums.add(_parseTrackPageSimilarAlbumSquare(element));
+      } catch (e) {
+        continue;
+      }
     }
     imageUrl = featuredOnAlbums.first.imageUrl;
     albumName = featuredOnAlbums.first.name;
