@@ -79,7 +79,7 @@ class LastFMProvider implements Provider {
   BaseTrackModel _parseTrackSquare(Bs4Element element) {
     var name = element.find("td.chartlist-name > a")?.text ?? "Unknown";
     var url = baseUrl +
-        element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
+        element.find("td.chartlist-name > a")!.attributes["href"]!.trim();
     var artistUrl = baseUrl +
         element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
     var sourceUrl =
@@ -775,10 +775,15 @@ class LastFMProvider implements Provider {
         continue;
       }
     }
-    var thisTrackAlbum = featuredOnAlbums.firstWhere(
-        (element) => element.name.toLowerCase() != name.toLowerCase());
-    imageUrl = thisTrackAlbum.imageUrl;
-    albumName = thisTrackAlbum.name;
+    try {
+      var thisTrackAlbum = featuredOnAlbums.firstWhere(
+          (element) => element.name.toLowerCase() != name.toLowerCase());
+      imageUrl = thisTrackAlbum.imageUrl;
+      albumName = thisTrackAlbum.name;
+    } catch (e) {
+      imageUrl = null;
+      albumName = null;
+    }
     List<BaseTrackModel> similarTracks = [];
     for (var element
         in soup.findAll("ol.track-similar-tracks--with-6 > li > div")) {
