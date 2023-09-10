@@ -1,4 +1,5 @@
 import 'package:backend/core/utils/date_helpers.dart';
+import "package:backend/core/values/constants.dart";
 import "package:backend/core/values/regex_patterns.dart";
 import "package:backend/data/models/base_models.dart";
 import "package:backend/data/network/dio/dio_client.dart";
@@ -351,6 +352,7 @@ class LastFMProvider implements Provider {
           .replaceAll("\r", "")
           .replaceAll('\\"', "")
           .replaceFirst("View wiki", "")
+          .replaceFirst("read more", "")
           .replaceAll("  ", " ")
           .trim();
     } catch (e) {
@@ -456,7 +458,7 @@ class LastFMProvider implements Provider {
   }
 
   BaseTrackModel _parseAlbumPageTrackListItem(Bs4Element element,
-      String artistUrl, String imageUrl, String artistName, String albumName) {
+      String artistUrl, String? imageUrl, String artistName, String albumName) {
     var name = element.find("td.chartlist-name > a")?.text ?? "Unknown";
     var number =
         int.tryParse(element.find("td.chartlist-index")?.text.trim() ?? "fail");
@@ -530,7 +532,7 @@ class LastFMProvider implements Provider {
     var name = soup.find(".header-new-title")?.text ?? "Unknown";
     var artistUrl =
         baseUrl + soup.find("a.header-new-crumb")!.attributes["href"]!;
-    var imageUrl = soup.find("a.cover-art > img")!.attributes["src"]!.trim();
+    var imageUrl = soup.find("a.cover-art > img")?.attributes["src"]?.trim();
     var artistName = soup.find(".header-new-crumb > span")?.text ?? "Unknown";
     var listeners = int.tryParse(soup
                 .find(".header-metadata-tnew-display > p > abbr")
@@ -560,6 +562,7 @@ class LastFMProvider implements Provider {
           .replaceAll("\r", "")
           .replaceAll('\\"', "")
           .replaceFirst("View wiki", "")
+          .replaceFirst("read more", "")
           .replaceAll("  ", " ")
           .trim();
     } catch (e) {
@@ -622,7 +625,7 @@ class LastFMProvider implements Provider {
         element.find("a.link-block-target")!.attributes["href"]!.trim();
     var artistUrl =
         url.split("/").sublist(0, url.split("/").length - 1).join("/");
-    var imageUrl = element.find(".cover-art > img")!.attributes["src"]!.trim();
+    var imageUrl = element.find(".cover-art > img")?.attributes["src"]?.trim();
     var artistName = element
         .find("span", attrs: {"itemprop": "name"})!
         .find("a")!
@@ -666,7 +669,7 @@ class LastFMProvider implements Provider {
             extractorUrl: extractorUrl,
           )
         : null;
-    var imageUrl = element.find(".cover-art > img")!.attributes["src"]!.trim();
+    var imageUrl = element.find(".cover-art > img")?.attributes["src"]?.trim();
     var artistName = element
         .find("span", attrs: {"itemprop": "name"})!
         .find("a")!
@@ -686,7 +689,7 @@ class LastFMProvider implements Provider {
     var name = element.find("a.link-block-target")?.text ?? "Unknown";
     var url = baseUrl +
         element.find("a.link-block-target")!.attributes["href"]!.trim();
-    var imageUrl = element.find(".avatar > img")!.attributes["src"]!.trim();
+    var imageUrl = element.find(".avatar > img")?.attributes["src"]?.trim();
     var listeners = int.tryParse(element
             .find("p.catalogue-overview-similar-artists-item-listeners")
             ?.text
@@ -720,8 +723,7 @@ class LastFMProvider implements Provider {
             extractorUrl: extractorUrl,
           )
         : null;
-    // var imageUrl = soup.find("img.video-preview")?.attributes["src"]?.trim();
-    String imageUrl = "";
+    String? imageUrl;
     var artistName =
         soup.find("span", attrs: {"itemprop": "name"})?.text ?? "Unknown";
     String? albumName;
@@ -744,6 +746,7 @@ class LastFMProvider implements Provider {
           .replaceAll("\r", "")
           .replaceAll('\\"', "")
           .replaceFirst("View wiki", "")
+          .replaceFirst("read more", "")
           .replaceAll("  ", " ")
           .trim();
     } catch (e) {
@@ -772,8 +775,10 @@ class LastFMProvider implements Provider {
         continue;
       }
     }
-    imageUrl = featuredOnAlbums.first.imageUrl;
-    albumName = featuredOnAlbums.first.name;
+    var thisTrackAlbum = featuredOnAlbums.firstWhere(
+        (element) => element.name.toLowerCase() != name.toLowerCase());
+    imageUrl = thisTrackAlbum.imageUrl;
+    albumName = thisTrackAlbum.name;
     List<BaseTrackModel> similarTracks = [];
     for (var element
         in soup.findAll("ol.track-similar-tracks--with-6 > li > div")) {
@@ -827,9 +832,206 @@ class LastFMProvider implements Provider {
     );
   }
 
+  BaseArtistModel _parseTagPageArtistSquare(Bs4Element element) {
+    var name = element.find("a.link-block-target")?.text ?? "Unknown";
+    var url = baseUrl +
+        element.find("a.link-block-target")!.attributes["href"]!.trim();
+    var imageUrl = element
+        .find(".grid-items-cover-image-image > img")
+        ?.attributes["src"]
+        ?.trim();
+    var listeners = int.tryParse(element
+            .find("p.grid-items-item-aux-text")
+            ?.text
+            .replaceFirst("listeners", "")
+            .trim()
+            .replaceAll(",", "") ??
+        "fail");
+    return BaseArtistModel(
+      name: name,
+      url: url,
+      imageUrl: imageUrl,
+      listeners: listeners,
+    );
+  }
+
+  BaseAlbumModel _parseTagPageAlbumSquare(Bs4Element element) {
+    var name = element.find(".link-block-target")?.text ?? "Unknown";
+    var url = baseUrl +
+        element.find(".link-block-target=")!.attributes["href"]!.trim();
+    var artistUrl = baseUrl +
+        element
+            .find(".grid-items-item-aux-text > a")!
+            .attributes["href"]!
+            .trim();
+    var imageUrl = element
+        .find(".grid-items-cover-image-image > img")
+        ?.attributes["src"]
+        ?.trim();
+    var artistName =
+        element.find("p.grid-items-item-aux-text > a")!.text.trim();
+    var listeners = int.tryParse(element
+            .find("p.grid-items-item-aux-text")
+            ?.text
+            .replaceFirst(artistName, "")
+            .replaceFirst("listeners", "")
+            .trim()
+            .replaceAll(",", "") ??
+        "fail");
+    return BaseAlbumModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      imageUrl: imageUrl,
+      artistName: artistName,
+      listeners: listeners,
+    );
+  }
+
+  BaseTrackModel _parseTagPageTrack(Bs4Element element) {
+    var name = element.find("td.chartlist-name > a")?.text.trim() ?? "Unknown";
+    var url = baseUrl +
+        element.find("td.chartlist-name > a")!.attributes["href"]!.trim();
+    var artistUrl = baseUrl +
+        element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
+    var sourceUrl =
+        element.find("td.chartlist-play > a")?.attributes["href"]?.trim();
+    String extractorUrl = "/api/v1/last_fm/extractor";
+    RawSongSource? source = sourceUrl != null
+        ? RawSongSource(
+            url: sourceUrl,
+            extractorUrl: extractorUrl,
+          )
+        : null;
+    var imageUrl = placeholderSongImageUrl;
+    var artistName = element.find("td.chartlist-artist > a")!.text.trim();
+    return BaseTrackModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      source: source,
+      imageUrl: imageUrl,
+      artistName: artistName,
+    );
+  }
+
+  DetailedTagModel _parseTagPageDetailedTag(Bs4Element element) {
+    var name = element.find("a.link-block-target")?.text ?? "Unknown";
+    var url = baseUrl +
+        element.find("a.link-block-target")!.attributes["href"]!.trim();
+    var imageUrl = element
+        .find(".grid-items-cover-image-image > img")
+        ?.attributes["src"]
+        ?.trim();
+    return DetailedTagModel(
+      name: name,
+      url: url,
+      imageUrl: imageUrl,
+    );
+  }
+
   @override
   Future<TagPageModel> getTag(String url) async {
-    throw UnimplementedError();
+    var response = await DioClient().client.get(Uri.decodeComponent(url));
+    var soup = BeautifulSoup(response.data);
+    var name = soup.find(".header-title")?.text.trim() ?? "Unknown";
+    var imageUrl = bgImageUrlRegExp
+        .firstMatch(
+            soup.find(".header-background")?.attributes["style"]?.trim() ?? "")
+        ?.group(1);
+    List<TagModel> similarTags = [];
+    for (var element in soup.findAll("body .tags-list--global > li")) {
+      similarTags.add(_parseTagBox(element));
+    }
+    var description = soup
+            .find("div.wiki-block")
+            ?.text
+            .trim()
+            .replaceAll("\n", "")
+            .replaceAll("\t", "")
+            .replaceAll("\r", "")
+            .replaceAll('\\"', "")
+            .replaceFirst("View wiki", "")
+            .replaceFirst("read more", "")
+            .replaceAll("  ", " ")
+            .trim() ??
+        "No description available";
+    var tagPageSectionsRaw = soup.findAll("body section.section-with-control");
+    var topArtistsSection = tagPageSectionsRaw.firstWhere((element) =>
+        element.find("h2")?.text.trim().toLowerCase() == "top artists");
+    List<BaseArtistModel> topArtists = [];
+    for (var element in topArtistsSection
+            .find("ol.grid-items--big-first")
+            ?.findAll("li > div") ??
+        []) {
+      topArtists.add(_parseTagPageArtistSquare(element));
+    }
+    var moreArtistsUrl =
+        topArtistsSection.find("p.more-link > a")?.attributes["href"]?.trim() !=
+                null
+            ? baseUrl +
+                topArtistsSection
+                    .find("p.more-link > a")!
+                    .attributes["href"]!
+                    .trim()
+            : null;
+    var topAlbumsSection = tagPageSectionsRaw.firstWhere((element) =>
+        element.find("h2")?.text.trim().toLowerCase() == "top albums");
+    List<BaseAlbumModel> topAlbums = [];
+    for (var element in topAlbumsSection
+            .find("ol.grid-items--big-first")
+            ?.findAll("li > div") ??
+        []) {
+      try {
+        topAlbums.add(_parseTagPageAlbumSquare(element));
+      } catch (e) {
+        continue;
+      }
+    }
+    var moreAlbumsUrl = topAlbumsSection
+                .find("p.more-link > a")
+                ?.attributes["href"]
+                ?.trim() !=
+            null
+        ? baseUrl +
+            topAlbumsSection.find("p.more-link > a")!.attributes["href"]!.trim()
+        : null;
+    var topTracksSection = tagPageSectionsRaw.firstWhere((element) =>
+        element.find("h2")?.text.trim().toLowerCase() == "top tracks");
+    List<BaseTrackModel> topTracks = [];
+    for (var element
+        in topTracksSection.find("table.chartlist > tbody")?.findAll("tr") ??
+            []) {
+      topTracks.add(_parseTagPageTrack(element));
+    }
+    var moreTracksUrl = topTracksSection
+                .find("p.more-link > a")
+                ?.attributes["href"]
+                ?.trim() !=
+            null
+        ? baseUrl +
+            topTracksSection.find("p.more-link > a")!.attributes["href"]!.trim()
+        : null;
+    List<DetailedTagModel> relatedTags = [];
+    for (var element in soup
+        .findAll("section.grid-items-section")
+        .last
+        .findAll("ol.grid-items > li > div")) {
+      relatedTags.add(_parseTagPageDetailedTag(element));
+    }
+    return TagPageModel(
+        name: name,
+        url: url,
+        imageUrl: imageUrl,
+        similarTags: similarTags,
+        description: description,
+        topArtists: topArtists,
+        moreArtistsUrl: moreArtistsUrl,
+        topAlbums: topAlbums,
+        moreAlbumsUrl: moreAlbumsUrl,
+        topTracks: topTracks,
+        moreTracksUrl: moreTracksUrl,
+        relatedTags: relatedTags);
   }
 
   @override

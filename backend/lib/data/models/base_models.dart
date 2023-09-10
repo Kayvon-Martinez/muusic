@@ -65,14 +65,14 @@ extension StringExtension on String {
 class BaseArtistModel {
   final String name;
   final String url;
-  final String imageUrl;
+  final String? imageUrl;
   final int? listeners;
   final ItemType itemType;
 
   BaseArtistModel({
     required this.name,
     required this.url,
-    required this.imageUrl,
+    this.imageUrl,
     this.listeners,
     this.itemType = ItemType.artist,
   });
@@ -102,7 +102,7 @@ class BaseAlbumModel {
   final String name;
   final String url;
   final String artistUrl;
-  final String imageUrl;
+  final String? imageUrl;
   final String artistName;
   final ItemType itemType;
   final int? listeners;
@@ -113,7 +113,7 @@ class BaseAlbumModel {
     required this.name,
     required this.url,
     required this.artistUrl,
-    required this.imageUrl,
+    this.imageUrl,
     required this.artistName,
     this.listeners,
     this.releaseDate,
@@ -183,7 +183,7 @@ class BaseTrackModel {
   final String url;
   final String artistUrl;
   final RawSongSource? source;
-  final String imageUrl;
+  final String? imageUrl;
   final String artistName;
   final String? albumName;
   final int? listeners;
@@ -196,7 +196,7 @@ class BaseTrackModel {
     required this.url,
     required this.artistUrl,
     this.source,
-    required this.imageUrl,
+    this.imageUrl,
     required this.artistName,
     this.albumName,
     this.listeners,
@@ -463,7 +463,7 @@ class DetailedArtistModel extends BaseArtistModel {
     required this.isTouring,
     required String name,
     required String url,
-    required String imageUrl,
+    required String? imageUrl,
     required int? listeners,
     ItemType itemType = ItemType.detailArtist,
     this.latestRelease,
@@ -569,7 +569,7 @@ class DetailedAlbumModel extends BaseAlbumModel {
     required String name,
     required String url,
     required String artistUrl,
-    required String imageUrl,
+    required String? imageUrl,
     required String artistName,
     required int? listeners,
     required DateTime? releaseDate,
@@ -662,7 +662,7 @@ class DetailedTrackModel extends BaseTrackModel {
     required String url,
     required String artistUrl,
     RawSongSource? source,
-    required String imageUrl,
+    String? imageUrl,
     required String artistName,
     String? albumName,
     int? listeners,
@@ -750,13 +750,13 @@ class DetailedTrackModel extends BaseTrackModel {
 }
 
 class DetailedTagModel extends TagModel {
-  final String imageUrl;
+  final String? imageUrl;
 
   DetailedTagModel({
     required String name,
     required String url,
     ItemType itemType = ItemType.detailTag,
-    required this.imageUrl,
+    this.imageUrl,
   }) : super(
           name: name,
           url: url,
@@ -784,24 +784,30 @@ class DetailedTagModel extends TagModel {
 }
 
 class TagPageModel extends TagModel {
+  final String? imageUrl;
   final List<TagModel> similarTags;
   final String description;
   final List<BaseArtistModel> topArtists;
-  final String moreArtistsUrl;
-  final List<BaseTrackModel> topTracks;
+  final String? moreArtistsUrl;
   final List<BaseAlbumModel> topAlbums;
+  final String? moreAlbumsUrl;
+  final List<BaseTrackModel> topTracks;
+  final String? moreTracksUrl;
   final List<DetailedTagModel> relatedTags;
 
   TagPageModel({
     required String name,
     required String url,
     ItemType itemType = ItemType.tagPage,
+    this.imageUrl,
     required this.similarTags,
     required this.description,
     required this.topArtists,
-    required this.moreArtistsUrl,
-    required this.topTracks,
+    this.moreArtistsUrl,
     required this.topAlbums,
+    this.moreAlbumsUrl,
+    required this.topTracks,
+    this.moreTracksUrl,
     required this.relatedTags,
   }) : super(
           name: name,
@@ -813,6 +819,7 @@ class TagPageModel extends TagModel {
     return TagPageModel(
       name: json['name'],
       url: json['url'],
+      imageUrl: json['imageUrl'],
       similarTags: (json['similarTags'] as List)
           .map((e) => TagModel.fromJson(e))
           .toList(),
@@ -821,12 +828,14 @@ class TagPageModel extends TagModel {
           .map((e) => BaseArtistModel.fromJson(e))
           .toList(),
       moreArtistsUrl: json['moreArtistsUrl'],
-      topTracks: (json['topTracks'] as List)
-          .map((e) => BaseTrackModel.fromJson(e))
-          .toList(),
       topAlbums: (json['topAlbums'] as List)
           .map((e) => BaseAlbumModel.fromJson(e))
           .toList(),
+      moreAlbumsUrl: json['moreAlbumsUrl'],
+      topTracks: (json['topTracks'] as List)
+          .map((e) => BaseTrackModel.fromJson(e))
+          .toList(),
+      moreTracksUrl: json['moreTracksUrl'],
       relatedTags: (json['relatedTags'] as List)
           .map((e) => DetailedTagModel.fromJson(e))
           .toList(),
@@ -839,12 +848,15 @@ class TagPageModel extends TagModel {
     return {
       'name': name,
       'url': url,
+      'imageUrl': imageUrl,
       'similarTags': similarTags.map((e) => e.toJson()).toList(),
       'description': description,
       'topArtists': topArtists.map((e) => e.toJson()).toList(),
       'moreArtistsUrl': moreArtistsUrl,
-      'topTracks': topTracks.map((e) => e.toJson()).toList(),
       'topAlbums': topAlbums.map((e) => e.toJson()).toList(),
+      'moreAlbumsUrl': moreAlbumsUrl,
+      'topTracks': topTracks.map((e) => e.toJson()).toList(),
+      'moreTracksUrl': moreTracksUrl,
       'relatedTags': relatedTags.map((e) => e.toJson()).toList(),
       'itemType': itemType.name,
     };
