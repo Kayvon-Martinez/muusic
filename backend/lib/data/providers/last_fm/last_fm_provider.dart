@@ -1046,7 +1046,10 @@ class LastFMProvider implements Provider {
     var lyricPars = soup.findAll("p.lyrics-paragraph");
     String lyrics = "";
     for (var element in lyricPars) {
-      lyrics += "${element.text.trim()}\n\n";
+      element.innerHtml.split("<br>").forEach((element) {
+        lyrics += "${element.trim()}\n";
+      });
+      lyrics += "\n";
     }
     return lyrics;
   }
