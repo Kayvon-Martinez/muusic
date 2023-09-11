@@ -1000,6 +1000,7 @@ class TagPageMoreTrackPageModel {
       'currentPageUrl': currentPageUrl,
       'firstPageUrl': firstPageUrl,
       'lastPageUrl': lastPageUrl,
+      'totalPages': totalPages,
     };
   }
 }

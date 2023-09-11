@@ -173,8 +173,27 @@ Future<void> start(
     }
   });
 
-  app.post("$apiPath/:id/tag/tracks",
-      (req, res) => res.json({'message': 'Not implemented'}));
+  app.post("$apiPath/:id/tag/tracks", (req, res) async {
+    res.headers.contentType = ContentType.json;
+    res.headers.add('Access-Control-Allow-Origin', '*');
+    var provider = detectSource(req.params['id']);
+    var body = await req.bodyAsJsonMap;
+    if (body['url'] == null) {
+      res.json({'error': 'No url provided'});
+      return;
+    }
+    try {
+      if (provider != null) {
+        var results = await provider.getTagTracks(body['url'], body['page']);
+        res.json(results.toJson());
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
+    }
+  });
 
   app.post("$apiPath/:id/lyrics", (req, res) async {
     res.headers.contentType = ContentType.json;

@@ -1278,9 +1278,87 @@ class LastFMProvider implements Provider {
     );
   }
 
+  BaseTrackModel _parseTagPageMoreTrackPage(Bs4Element element) {
+    var name = element.find("td.chartlist-name > a")?.text.trim() ?? "Unknown";
+    var url = baseUrl +
+        element.find("td.chartlist-name > a")!.attributes["href"]!.trim();
+    var artistUrl = baseUrl +
+        element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
+    var sourceUrl =
+        element.find("td.chartlist-play > a")?.attributes["href"]?.trim();
+    String extractorUrl = "/api/v1/last_fm/extractor";
+    RawSongSource? source = sourceUrl != null
+        ? RawSongSource(
+            url: sourceUrl,
+            extractorUrl: extractorUrl,
+          )
+        : null;
+    var imageUrl = placeholderSongImageUrl;
+    var artistName = element.find("td.chartlist-artist > a")!.text.trim();
+    return BaseTrackModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      source: source,
+      imageUrl: imageUrl,
+      artistName: artistName,
+    );
+  }
+
   @override
   Future<TagPageMoreTrackPageModel> getTagTracks(String url, int? page) async {
-    throw UnimplementedError();
+    String newUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=${page ?? 1}")
+        : "$url?page=${page ?? 1}";
+    var response = await DioClient().client.get(Uri.decodeComponent(newUrl));
+    var soup = BeautifulSoup(response.data);
+    int currentPageNumber = page ?? 1;
+    int lastPageNumber =
+        int.tryParse(soup.findAll("li.pagination-page > a").last.text.trim()) ??
+            1;
+    String? nextPageUrl;
+    if (currentPageNumber < lastPageNumber) {
+      nextPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=${currentPageNumber + 1}")
+          : "$url?page=${currentPageNumber + 1}";
+    }
+    String? previousPageUrl;
+    if (currentPageNumber > 1) {
+      previousPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=${currentPageNumber - 1}")
+          : "$url?page=${currentPageNumber - 1}";
+    }
+    String? currentPageUrl;
+    currentPageUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=$currentPageNumber")
+        : "$url?page=$currentPageNumber";
+    String? firstPageUrl;
+    firstPageUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=1")
+        : "$url?page=1";
+    String? lastPageUrl;
+    if (currentPageNumber != lastPageNumber) {
+      lastPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=$lastPageNumber")
+          : "$url?page=$lastPageNumber";
+    }
+    List<BaseTrackModel> tracks = [];
+    for (var element in soup.findAll("tr.chartlist-row")) {
+      try {
+        tracks.add(_parseTagPageMoreTrackPage(element));
+      } catch (e) {
+        continue;
+      }
+    }
+    return TagPageMoreTrackPageModel(
+      tracks: tracks,
+      nextPageUrl: nextPageUrl,
+      previousPageUrl: previousPageUrl,
+      currentPageUrl: currentPageUrl,
+      firstPageUrl: firstPageUrl,
+      lastPageUrl: lastPageUrl,
+      totalPages: lastPageNumber,
+    );
   }
 
   @override
