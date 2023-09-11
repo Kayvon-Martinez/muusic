@@ -3,4 +3,4 @@
 .dart_tool/
 
 # Ignore executables in bin directory
-!*/bin/*.exe
+backend/bin/*.exe
