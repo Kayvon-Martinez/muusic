@@ -1152,9 +1152,130 @@ class LastFMProvider implements Provider {
     );
   }
 
+  BaseAlbumModel _parseTagPageMoreAlbumPage(Bs4Element element) {
+    var name = element
+            .find("h3.resource-list--release-list-item-name > a")
+            ?.text
+            .trim() ??
+        "Unknown";
+    var url = baseUrl +
+        element
+            .find("h3.resource-list--release-list-item-name > a")!
+            .attributes["href"]!
+            .trim();
+    var artistUrl = baseUrl +
+        baseUrl +
+        element
+            .find("span", attrs: {"itemprop": "name"})!
+            .find("a")!
+            .attributes["href"]!
+            .trim();
+    var imageUrl = element.find(".cover-art > img")?.attributes["src"]?.trim();
+    var artistName = element
+            .find("span", attrs: {"itemprop": "name"})
+            ?.find("a")
+            ?.text
+            .trim() ??
+        "Unknown";
+    var listeners = int.tryParse(element
+            .find("p.resource-list--release-list-item-listeners")
+            ?.text
+            .replaceFirst(artistName, "")
+            .replaceFirst("listeners", "")
+            .trim()
+            .replaceAll(",", "") ??
+        "fail");
+    DateTime? releaseDate;
+    try {
+      releaseDate = dateStringSpacesToDateTime(element
+          .findAll("p.resource-list--release-list-item-aux-text")
+          .last
+          .text
+          .split("·")[0]
+          .trim());
+    } catch (e) {
+      releaseDate = null;
+    }
+    int? numberOfTracks;
+    try {
+      numberOfTracks = int.tryParse(element
+          .findAll("p.resource-list--release-list-item-aux-text")
+          .last
+          .text
+          .split("·")[1]
+          .trim()
+          .split("track")[0]
+          .trim());
+    } catch (e) {
+      numberOfTracks = null;
+    }
+    return BaseAlbumModel(
+      name: name,
+      url: url,
+      artistUrl: artistUrl,
+      imageUrl: imageUrl,
+      artistName: artistName,
+      listeners: listeners,
+      releaseDate: releaseDate,
+      numberOfTracks: numberOfTracks,
+    );
+  }
+
   @override
   Future<TagPageMoreAlbumPageModel> getTagAlbums(String url, int? page) async {
-    throw UnimplementedError();
+    String newUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=${page ?? 1}")
+        : "$url?page=${page ?? 1}";
+    var response = await DioClient().client.get(Uri.decodeComponent(newUrl));
+    var soup = BeautifulSoup(response.data);
+    int currentPageNumber = page ?? 1;
+    int lastPageNumber =
+        int.tryParse(soup.findAll("li.pagination-page > a").last.text.trim()) ??
+            1;
+    String? nextPageUrl;
+    if (currentPageNumber < lastPageNumber) {
+      nextPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=${currentPageNumber + 1}")
+          : "$url?page=${currentPageNumber + 1}";
+    }
+    String? previousPageUrl;
+    if (currentPageNumber > 1) {
+      previousPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=${currentPageNumber - 1}")
+          : "$url?page=${currentPageNumber - 1}";
+    }
+    String? currentPageUrl;
+    currentPageUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=$currentPageNumber")
+        : "$url?page=$currentPageNumber";
+    String? firstPageUrl;
+    firstPageUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=1")
+        : "$url?page=1";
+    String? lastPageUrl;
+    if (currentPageNumber != lastPageNumber) {
+      lastPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=$lastPageNumber")
+          : "$url?page=$lastPageNumber";
+    }
+    List<BaseAlbumModel> albums = [];
+    for (var element
+        in soup.findAll("li.resource-list--release-list-item-wrap")) {
+      try {
+        albums.add(_parseTagPageMoreAlbumPage(element));
+      } catch (e) {
+        continue;
+      }
+    }
+    return TagPageMoreAlbumPageModel(
+      albums: albums,
+      nextPageUrl: nextPageUrl,
+      previousPageUrl: previousPageUrl,
+      currentPageUrl: currentPageUrl,
+      firstPageUrl: firstPageUrl,
+      lastPageUrl: lastPageUrl,
+      totalPages: lastPageNumber,
+    );
   }
 
   @override
