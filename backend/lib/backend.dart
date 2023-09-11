@@ -50,17 +50,17 @@ Future<void> start(
       res.json({'error': 'No url provided'});
       return;
     }
-    try {
-      if (provider != null) {
-        var results = await provider.getArtist(body['url']);
-        res.json(results.toJson());
-      } else {
-        res.json({'error': 'Provider not found'});
-      }
-    } catch (e) {
-      res.statusCode = 500;
-      res.json({'error': e.toString()});
+    // try {
+    if (provider != null) {
+      var results = await provider.getArtist(body['url']);
+      res.json(results.toJson());
+    } else {
+      res.json({'error': 'Provider not found'});
     }
+    // } catch (e) {
+    // res.statusCode = 500;
+    // res.json({'error': e.toString()});
+    // }
   });
 
   app.post("$apiPath/:id/details/album", (req, res) async {

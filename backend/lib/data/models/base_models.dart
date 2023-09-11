@@ -456,7 +456,7 @@ class DetailedArtistModel extends BaseArtistModel {
   final DateTime? diedWhen;
   final List<TagModel> tags;
   final List<BaseTrackModel> topTracks;
-  final String allTracksUrl;
+  final String? allTracksUrl;
   final List<String> photoUrls;
   final String? morePhotosUrl;
   final List<BaseAlbumModel> albums;
@@ -479,7 +479,7 @@ class DetailedArtistModel extends BaseArtistModel {
     this.diedWhen,
     required this.tags,
     required this.topTracks,
-    required this.allTracksUrl,
+    this.allTracksUrl,
     required this.photoUrls,
     this.morePhotosUrl,
     required this.albums,

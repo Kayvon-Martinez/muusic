@@ -183,7 +183,7 @@ class LastFMProvider implements Provider {
             extractorUrl: extractorUrl,
           )
         : null;
-    var imageUrl = element.find(".cover-art > img")!.attributes["src"]!.trim();
+    var imageUrl = element.find(".cover-art > img")?.attributes["src"]?.trim();
     var albumName =
         element.find("a.cover-art > img")?.attributes["alt"]?.trim();
     var listeners = int.tryParse(element
@@ -281,60 +281,70 @@ class LastFMProvider implements Provider {
     var isTouring = soup.find(".header-new-on-tour") != null;
     var latestReleaseAndPopularRaw =
         soup.findAll("li.artist-header-featured-items-item-wrap");
-    Bs4Element latestReleaseRaw = latestReleaseAndPopularRaw.firstWhere(
-        (element) =>
-            element.find("div > h4")?.text.trim().toLowerCase() ==
-            "latest release");
-    BaseAlbumModel? latestRelease = latestReleaseRaw.find("div") != null
-        ? BaseAlbumModel(
-            name: latestReleaseRaw.find("div > h3 > a")!.text.trim(),
-            url: baseUrl +
-                latestReleaseRaw
-                    .find("div > h3 > a")!
-                    .attributes["href"]!
-                    .trim(),
-            artistUrl: url,
-            imageUrl: latestReleaseRaw
-                .find("div .cover-art > img")!
-                .attributes["src"]!
-                .trim(),
-            artistName: name,
-          )
-        : null;
-    Bs4Element popularThisWeekRaw = latestReleaseAndPopularRaw.firstWhere(
-        (element) =>
-            element.find("div > h4")?.text.trim().toLowerCase() ==
-            "popular this week");
-    BaseTrackModel? popularThisWeek = popularThisWeekRaw.find("div") != null
-        ? BaseTrackModel(
-            name: popularThisWeekRaw.find("div > h3 > a")!.text.trim(),
-            url: baseUrl +
-                popularThisWeekRaw
-                    .find("div > h3 > a")!
-                    .attributes["href"]!
-                    .trim(),
-            artistUrl: url,
-            source: RawSongSource(
-              extractorUrl: "/api/v1/last_fm/extractor",
-              url: popularThisWeekRaw
-                  .find("div .image-overlay-playlink-link")!
-                  .attributes["href"]!
+    BaseAlbumModel? latestRelease;
+    try {
+      Bs4Element latestReleaseRaw = latestReleaseAndPopularRaw.firstWhere(
+          (element) =>
+              element.find("div > h4")?.text.trim().toLowerCase() ==
+              "latest release");
+      latestRelease = latestReleaseRaw.find("div") != null
+          ? BaseAlbumModel(
+              name: latestReleaseRaw.find("div > h3 > a")!.text.trim(),
+              url: baseUrl +
+                  latestReleaseRaw
+                      .find("div > h3 > a")!
+                      .attributes["href"]!
+                      .trim(),
+              artistUrl: url,
+              imageUrl: latestReleaseRaw
+                  .find("div .cover-art > img")!
+                  .attributes["src"]!
                   .trim(),
-            ),
-            imageUrl: popularThisWeekRaw
-                .find("div .video-preview")!
-                .attributes["src"]!
-                .trim(),
-            artistName: name,
-            listeners: int.tryParse(popularThisWeekRaw
-                    .find(".artist-header-featured-items-item-listeners")!
-                    .text
-                    .replaceAll(",", "")
-                    .replaceFirst("listeners", "")
-                    .trim()) ??
-                0,
-          )
-        : null;
+              artistName: name,
+            )
+          : null;
+    } catch (e) {
+      latestRelease = null;
+    }
+    BaseTrackModel? popularThisWeek;
+    try {
+      Bs4Element popularThisWeekRaw = latestReleaseAndPopularRaw.firstWhere(
+          (element) =>
+              element.find("div > h4")?.text.trim().toLowerCase() ==
+              "popular this week");
+      popularThisWeek = popularThisWeekRaw.find("div") != null
+          ? BaseTrackModel(
+              name: popularThisWeekRaw.find("div > h3 > a")!.text.trim(),
+              url: baseUrl +
+                  popularThisWeekRaw
+                      .find("div > h3 > a")!
+                      .attributes["href"]!
+                      .trim(),
+              artistUrl: url,
+              source: RawSongSource(
+                extractorUrl: "/api/v1/last_fm/extractor",
+                url: popularThisWeekRaw
+                    .find("div .image-overlay-playlink-link")!
+                    .attributes["href"]!
+                    .trim(),
+              ),
+              imageUrl: popularThisWeekRaw
+                  .find("div .video-preview")!
+                  .attributes["src"]!
+                  .trim(),
+              artistName: name,
+              listeners: int.tryParse(popularThisWeekRaw
+                      .find(".artist-header-featured-items-item-listeners")!
+                      .text
+                      .replaceAll(",", "")
+                      .replaceFirst("listeners", "")
+                      .trim()) ??
+                  0,
+            )
+          : null;
+    } catch (e) {
+      popularThisWeek = null;
+    }
     List<BaseArtistModel> similarArtists = [];
     for (var element in soup
         .findAll(".catalogue-overview-similar-artists-full-width > li > div")) {
@@ -379,29 +389,44 @@ class LastFMProvider implements Provider {
     for (var element in soup.findAll("tr.chartlist-row")) {
       topTracks.add(_parseTrackSquareDetailScreen(element, url, name));
     }
-    var allTracksUrl = baseUrl +
-        soup
-            .find(".more-link-fullwidth--no-border > a")!
-            .attributes["href"]!
-            .trim();
-    List<String> photoUrls = [];
-    for (var element
-        in soup.findAll("ul.sidebar-image-list").last.findAll("img")) {
-      photoUrls.add(baseUrl + element.attributes["src"]!.trim());
-    }
-    String? morePhotosUrl = soup
-                .findAll("p.more-link-with-action > a")
-                .last
-                .attributes["href"]
+    var allTracksUrl = soup
+                .find(".more-link-fullwidth--no-border > a")
+                ?.attributes["href"]
                 ?.trim() !=
             null
         ? baseUrl +
             soup
-                .findAll("p.more-link-with-action > a")
-                .last
+                .find(".more-link-fullwidth--no-border > a")!
                 .attributes["href"]!
                 .trim()
         : null;
+    List<String> photoUrls = [];
+    try {
+      for (var element
+          in soup.findAll("ul.sidebar-image-list").last.findAll("img")) {
+        photoUrls.add(baseUrl + element.attributes["src"]!.trim());
+      }
+    } catch (e) {
+      photoUrls = [];
+    }
+    String? morePhotosUrl;
+    try {
+      morePhotosUrl = soup
+                  .findAll("p.more-link-with-action > a")
+                  .last
+                  .attributes["href"]
+                  ?.trim() !=
+              null
+          ? baseUrl +
+              soup
+                  .findAll("p.more-link-with-action > a")
+                  .last
+                  .attributes["href"]!
+                  .trim()
+          : null;
+    } catch (e) {
+      morePhotosUrl = null;
+    }
     List<BaseAlbumModel> albums = [];
     for (var element in soup.findAll("li.artist-top-albums-item-wrap > div")) {
       albums.add(_parseAlbumSquareDetailScreen(element, url, name));
@@ -414,25 +439,30 @@ class LastFMProvider implements Provider {
         url: element.attributes["href"]!.trim(),
       ));
     }
-    var eventsUrl = soup
-                .findAll(
-                    "section.section-with-control > div > p.more-link-with-action")
-                .last
-                .findAll("a")
-                .last
-                .attributes["href"]
-                ?.trim() !=
-            null
-        ? baseUrl +
-            soup
-                .findAll(
-                    "section.section-with-control > div > p.more-link-with-action")
-                .last
-                .findAll("a")
-                .last
-                .attributes["href"]!
-                .trim()
-        : null;
+    String? eventsUrl;
+    try {
+      eventsUrl = soup
+                  .findAll(
+                      "section.section-with-control > div > p.more-link-with-action")
+                  .last
+                  .findAll("a")
+                  .last
+                  .attributes["href"]
+                  ?.trim() !=
+              null
+          ? baseUrl +
+              soup
+                  .findAll(
+                      "section.section-with-control > div > p.more-link-with-action")
+                  .last
+                  .findAll("a")
+                  .last
+                  .attributes["href"]!
+                  .trim()
+          : null;
+    } catch (e) {
+      eventsUrl = null;
+    }
     return DetailedArtistModel(
       name: name,
       url: url,
@@ -1090,17 +1120,13 @@ class LastFMProvider implements Provider {
           : "$url?page=${currentPageNumber - 1}";
     }
     String? currentPageUrl;
-    if (currentPageNumber != 1) {
-      currentPageUrl = url.contains("?page=")
-          ? url.replaceFirst("?page=", "?page=$currentPageNumber")
-          : "$url?page=$currentPageNumber";
-    }
+    currentPageUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=$currentPageNumber")
+        : "$url?page=$currentPageNumber";
     String? firstPageUrl;
-    if (currentPageNumber != 1) {
-      firstPageUrl = url.contains("?page=")
-          ? url.replaceFirst("?page=", "?page=1")
-          : "$url?page=1";
-    }
+    firstPageUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=1")
+        : "$url?page=1";
     String? lastPageUrl;
     if (currentPageNumber != lastPageNumber) {
       lastPageUrl = url.contains("?page=")
