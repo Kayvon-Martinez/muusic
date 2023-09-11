@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:alfred/alfred.dart';
+import 'package:backend/data/models/base_models.dart';
 
 import 'data/providers/last_fm/last_fm_provider.dart';
 
@@ -250,9 +251,8 @@ Future<void> start(
     }
     try {
       if (provider != null) {
-        var data = await provider.extractor(body['url']) as List<int>;
-        res.setDownload(filename: 'audio.webm');
-        res.add(data);
+        var data = await provider.extractor(body['url']) as SongInfo;
+        res.json(data.toJson());
       } else {
         res.json({'error': 'Provider not found'});
       }

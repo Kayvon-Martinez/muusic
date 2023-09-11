@@ -15,5 +15,5 @@ abstract class Provider {
   Future<TagPageMoreTrackPageModel> getTagTracks(String url, int? page);
   Future<String> getLyrics(String url);
   Future<List<EventModel>> getEvents(String url);
-  Future<List<int>> extractor(String url);
+  Future<SongInfo> extractor(String url);
 }

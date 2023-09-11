@@ -1,3 +1,5 @@
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+
 enum ItemType {
   artist,
   album,
@@ -1001,6 +1003,44 @@ class TagPageMoreTrackPageModel {
       'firstPageUrl': firstPageUrl,
       'lastPageUrl': lastPageUrl,
       'totalPages': totalPages,
+    };
+  }
+}
+
+class SongInfo {
+  final String streamUrl;
+  final String? audioCodec;
+  final Bitrate? bitrate;
+  final String? qualityLabel;
+  final FileSize? fileSize;
+
+  SongInfo({
+    required this.streamUrl,
+    this.audioCodec,
+    this.bitrate,
+    this.qualityLabel,
+    this.fileSize,
+  });
+
+  factory SongInfo.fromJson(Map<String, dynamic> json) {
+    return SongInfo(
+      streamUrl: json['streamUrl'],
+      audioCodec: json['audioCodec'],
+      bitrate:
+          json['bitrate'] != null ? Bitrate.fromJson(json['bitrate']) : null,
+      qualityLabel: json['qualityLabel'],
+      fileSize:
+          json['fileSize'] != null ? FileSize.fromJson(json['fileSize']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'streamUrl': streamUrl,
+      'audioCodec': audioCodec,
+      'bitrate': bitrate?.toJson(),
+      'qualityLabel': qualityLabel,
+      'fileSize': fileSize?.toJson(),
     };
   }
 }

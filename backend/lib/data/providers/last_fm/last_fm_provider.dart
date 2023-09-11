@@ -1420,7 +1420,7 @@ class LastFMProvider implements Provider {
   }
 
   @override
-  Future<List<int>> extractor(String url) async {
+  Future<SongInfo> extractor(String url) async {
     return (await getYTVideoAudioData(url));
   }
 }
