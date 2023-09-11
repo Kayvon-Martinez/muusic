@@ -413,15 +413,15 @@ class EventModel {
   final DateTime date;
   final String title;
   final List<String> performers;
-  final String locationName;
-  final String location;
+  final String venue;
+  final String address;
 
   EventModel({
     required this.date,
     required this.title,
     required this.performers,
-    required this.locationName,
-    required this.location,
+    required this.venue,
+    required this.address,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
@@ -429,8 +429,8 @@ class EventModel {
       date: DateTime.tryParse(json['date']) ?? DateTime.now(),
       title: json['title'],
       performers: (json['performers'] as List).cast<String>(),
-      locationName: json['locationName'],
-      location: json['location'],
+      venue: json['venue'],
+      address: json['address'],
     );
   }
 
@@ -439,8 +439,8 @@ class EventModel {
       'date': date.toIso8601String(),
       'title': title,
       'performers': performers,
-      'locationName': locationName,
-      'location': location,
+      'venue': venue,
+      'address': address,
     };
   }
 }

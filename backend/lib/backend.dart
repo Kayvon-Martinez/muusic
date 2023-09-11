@@ -94,17 +94,17 @@ Future<void> start(
       res.json({'error': 'No url provided'});
       return;
     }
-    try {
-      if (provider != null) {
-        var results = await provider.getTrack(body['url']);
-        res.json(results.toJson());
-      } else {
-        res.json({'error': 'Provider not found'});
-      }
-    } catch (e) {
-      res.statusCode = 500;
-      res.json({'error': e.toString()});
+    // try {
+    if (provider != null) {
+      var results = await provider.getTrack(body['url']);
+      res.json(results.toJson());
+    } else {
+      res.json({'error': 'Provider not found'});
     }
+    // } catch (e) {
+    //   res.statusCode = 500;
+    //   res.json({'error': e.toString()});
+    // }
   });
 
   app.post("$apiPath/:id/details/tag", (req, res) async {
@@ -217,8 +217,27 @@ Future<void> start(
     }
   });
 
-  app.post("$apiPath/:id/events",
-      (req, res) => res.json({'message': 'Not implemented'}));
+  app.post("$apiPath/:id/events", (req, res) async {
+    res.headers.contentType = ContentType.json;
+    res.headers.add('Access-Control-Allow-Origin', '*');
+    var body = await req.bodyAsJsonMap;
+    var provider = detectSource(req.params['id']);
+    if (body['url'] == null) {
+      res.json({'error': 'No url provided'});
+      return;
+    }
+    try {
+      if (provider != null) {
+        var results = await provider.getEvents(body['url']);
+        res.json(results.map((e) => e.toJson()).toList());
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
+    }
+  });
 
   app.post("$apiPath/:id/extractor",
       (req, res) => res.json({'message': 'Not implemented'}));

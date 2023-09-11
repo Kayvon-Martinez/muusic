@@ -820,18 +820,22 @@ class LastFMProvider implements Provider {
       similarTracks.add(_parseTrackPageSimilarTrackSquare(element));
     }
     List<ExternalLinksModel> playLinks = [];
-    for (var element
-        in soup.findAll("ul.play-this-track-playlinks").last.findAll("li")) {
-      playLinks.add(ExternalLinksModel(
-        type: element
-            .find("a")!
-            .text
-            .split("(")[0]
-            .trim()
-            .toString()
-            .externalLinksType,
-        url: element.find("a")!.attributes["href"]!.trim(),
-      ));
+    try {
+      for (var element
+          in soup.findAll("ul.play-this-track-playlinks").last.findAll("li")) {
+        playLinks.add(ExternalLinksModel(
+          type: element
+              .find("a")!
+              .text
+              .split("(")[0]
+              .trim()
+              .toString()
+              .externalLinksType,
+          url: element.find("a")!.attributes["href"]!.trim(),
+        ));
+      }
+    } catch (e) {
+      playLinks = [];
     }
     List<ExternalLinksModel> externalLinks = [];
     for (var element
@@ -1376,9 +1380,42 @@ class LastFMProvider implements Provider {
     return lyrics;
   }
 
+  EventModel _parseEventModelPageEvent(Bs4Element element) {
+    DateTime date = DateTime.parse(element
+        .find("time.events-list-item-date-icon")!
+        .attributes["datetime"]!
+        .trim());
+    var title =
+        element.find("a.link-block-target > span")?.text.trim() ?? "Unknown";
+    List<String> performers = [];
+    for (var element
+        in element.findAll("span", attrs: {"itemprop": "performer"})) {
+      performers.add(element.text.trim());
+    }
+    var venue =
+        element.find("div.events-list-item-venue--title")?.text.trim() ??
+            "Unknown";
+    var address =
+        element.find("div.events-list-item-venue--address")?.text.trim() ??
+            "Unknown";
+    return EventModel(
+      date: date,
+      title: title,
+      performers: performers,
+      venue: venue,
+      address: address,
+    );
+  }
+
   @override
   Future<List<EventModel>> getEvents(String url) async {
-    throw UnimplementedError();
+    var response = await DioClient().client.get(Uri.decodeComponent(url));
+    var soup = BeautifulSoup(response.data);
+    List<EventModel> events = [];
+    for (var element in soup.findAll("table.events-list > tbody > tr")) {
+      events.add(_parseEventModelPageEvent(element));
+    }
+    return events;
   }
 
   @override
