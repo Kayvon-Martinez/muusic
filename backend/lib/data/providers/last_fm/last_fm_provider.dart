@@ -1039,6 +1039,103 @@ class LastFMProvider implements Provider {
         relatedTags: relatedTags);
   }
 
+  BaseArtistModel _parseTagPageMoreArtistPage(Bs4Element element) {
+    var name = element.find("a.link-block-target")?.text ?? "Unknown";
+    var url = baseUrl +
+        element.find("a.link-block-target")!.attributes["href"]!.trim();
+    var imageUrl = element
+        .find(".big-artist-list-avatar-desktop > img")
+        ?.attributes["src"]
+        ?.trim();
+    var listeners = int.tryParse(element
+            .find("p.big-artist-list-listeners")
+            ?.text
+            .replaceFirst("listeners", "")
+            .trim()
+            .replaceAll(",", "") ??
+        "fail");
+    var shortDescription =
+        element.find("div.big-artist-list-bio > p")?.text.trim();
+    return BaseArtistModel(
+      name: name,
+      url: url,
+      imageUrl: imageUrl,
+      listeners: listeners,
+      shortDescription: shortDescription,
+    );
+  }
+
+  @override
+  Future<TagPageMoreArtistPageModel> getTagArtists(
+      String url, int? page) async {
+    String newUrl = url.contains("?page=")
+        ? url.replaceFirst("?page=", "?page=${page ?? 1}")
+        : "$url?page=${page ?? 1}";
+    var response = await DioClient().client.get(Uri.decodeComponent(newUrl));
+    var soup = BeautifulSoup(response.data);
+    int currentPageNumber = page ?? 1;
+    int lastPageNumber =
+        int.tryParse(soup.findAll("li.pagination-page > a").last.text.trim()) ??
+            1;
+    String? nextPageUrl;
+    if (currentPageNumber < lastPageNumber) {
+      nextPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=${currentPageNumber + 1}")
+          : "$url?page=${currentPageNumber + 1}";
+    }
+    String? previousPageUrl;
+    if (currentPageNumber > 1) {
+      previousPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=${currentPageNumber - 1}")
+          : "$url?page=${currentPageNumber - 1}";
+    }
+    String? currentPageUrl;
+    if (currentPageNumber != 1) {
+      currentPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=$currentPageNumber")
+          : "$url?page=$currentPageNumber";
+    }
+    String? firstPageUrl;
+    if (currentPageNumber != 1) {
+      firstPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=1")
+          : "$url?page=1";
+    }
+    String? lastPageUrl;
+    if (currentPageNumber != lastPageNumber) {
+      lastPageUrl = url.contains("?page=")
+          ? url.replaceFirst("?page=", "?page=$lastPageNumber")
+          : "$url?page=$lastPageNumber";
+    }
+    List<BaseArtistModel> artists = [];
+    for (var element in soup.findAll("li.big-artist-list-wrap")) {
+      try {
+        artists.add(_parseTagPageMoreArtistPage(element));
+      } catch (e) {
+        continue;
+      }
+    }
+    return TagPageMoreArtistPageModel(
+      artists: artists,
+      nextPageUrl: nextPageUrl,
+      previousPageUrl: previousPageUrl,
+      currentPageUrl: currentPageUrl,
+      firstPageUrl: firstPageUrl,
+      lastPageUrl: lastPageUrl,
+      totalPages: lastPageNumber,
+    );
+  }
+
+  @override
+  Future<TagPageMoreAlbumPageModel> getTagAlbums(String url, int? page) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<TagPageMoreTrackPageModel> getTagTracks(String url, int? page) async {
+    throw UnimplementedError();
+  }
+
   @override
   Future<String> getLyrics(String url) async {
     var response = await DioClient().client.get(Uri.decodeComponent(url));
@@ -1052,21 +1149,6 @@ class LastFMProvider implements Provider {
       lyrics += "\n";
     }
     return lyrics;
-  }
-
-  @override
-  Future<List<BaseArtistModel>> getTagArtists(String url) async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<BaseAlbumModel>> getTagAlbums(String url) async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<BaseTrackModel>> getTagTracks(String url) async {
-    throw UnimplementedError();
   }
 
   @override

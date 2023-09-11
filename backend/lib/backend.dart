@@ -28,11 +28,16 @@ Future<void> start(
     res.headers.contentType = ContentType.json;
     res.headers.add('Access-Control-Allow-Origin', '*');
     var provider = detectSource(req.params['id']);
-    if (provider != null) {
-      var results = await provider.search(req.params['query']);
-      res.json(results.toJson());
-    } else {
-      res.json({'error': 'Provider not found'});
+    try {
+      if (provider != null) {
+        var results = await provider.search(req.params['query']);
+        res.json(results.toJson());
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
     }
   });
 
@@ -45,11 +50,16 @@ Future<void> start(
       res.json({'error': 'No url provided'});
       return;
     }
-    if (provider != null) {
-      var results = await provider.getArtist(body['url']);
-      res.json(results.toJson());
-    } else {
-      res.json({'error': 'Provider not found'});
+    try {
+      if (provider != null) {
+        var results = await provider.getArtist(body['url']);
+        res.json(results.toJson());
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
     }
   });
 
@@ -62,11 +72,16 @@ Future<void> start(
       res.json({'error': 'No url provided'});
       return;
     }
-    if (provider != null) {
-      var results = await provider.getAlbum(body['url']);
-      res.json(results.toJson());
-    } else {
-      res.json({'error': 'Provider not found'});
+    try {
+      if (provider != null) {
+        var results = await provider.getAlbum(body['url']);
+        res.json(results.toJson());
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
     }
   });
 
@@ -79,11 +94,16 @@ Future<void> start(
       res.json({'error': 'No url provided'});
       return;
     }
-    if (provider != null) {
-      var results = await provider.getTrack(body['url']);
-      res.json(results.toJson());
-    } else {
-      res.json({'error': 'Provider not found'});
+    try {
+      if (provider != null) {
+        var results = await provider.getTrack(body['url']);
+        res.json(results.toJson());
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
     }
   });
 
@@ -96,13 +116,46 @@ Future<void> start(
       res.json({'error': 'No url provided'});
       return;
     }
-    if (provider != null) {
-      var results = await provider.getTag(body['url']);
-      res.json(results.toJson());
-    } else {
-      res.json({'error': 'Provider not found'});
+    try {
+      if (provider != null) {
+        var results = await provider.getTag(body['url']);
+        res.json(results.toJson());
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
     }
   });
+
+  app.post("$apiPath/:id/tag/artists", (req, res) async {
+    res.headers.contentType = ContentType.json;
+    res.headers.add('Access-Control-Allow-Origin', '*');
+    var provider = detectSource(req.params['id']);
+    var body = await req.bodyAsJsonMap;
+    if (body['url'] == null) {
+      res.json({'error': 'No url provided'});
+      return;
+    }
+    try {
+      if (provider != null) {
+        var results = await provider.getTagArtists(body['url'], body['page']);
+        res.json(results.toJson());
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
+    }
+  });
+
+  app.post("$apiPath/:id/tag/albums",
+      (req, res) => res.json({'message': 'Not implemented'}));
+
+  app.post("$apiPath/:id/tag/tracks",
+      (req, res) => res.json({'message': 'Not implemented'}));
 
   app.post("$apiPath/:id/lyrics", (req, res) async {
     res.headers.contentType = ContentType.json;
@@ -113,22 +166,18 @@ Future<void> start(
       res.json({'error': 'No url provided'});
       return;
     }
-    if (provider != null) {
-      var results = await provider.getLyrics(body['url']);
-      res.json({'lyrics': results});
-    } else {
-      res.json({'error': 'Provider not found'});
+    try {
+      if (provider != null) {
+        var results = await provider.getLyrics(body['url']);
+        res.json({'lyrics': results});
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
     }
   });
-
-  app.post("$apiPath/:id/tag/artists",
-      (req, res) => res.json({'message': 'Not implemented'}));
-
-  app.post("$apiPath/:id/tag/albums",
-      (req, res) => res.json({'message': 'Not implemented'}));
-
-  app.post("$apiPath/:id/tag/tracks",
-      (req, res) => res.json({'message': 'Not implemented'}));
 
   app.post("$apiPath/:id/events",
       (req, res) => res.json({'message': 'Not implemented'}));

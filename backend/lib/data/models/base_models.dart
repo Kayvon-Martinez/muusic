@@ -67,6 +67,7 @@ class BaseArtistModel {
   final String url;
   final String? imageUrl;
   final int? listeners;
+  final String? shortDescription;
   final ItemType itemType;
 
   BaseArtistModel({
@@ -74,6 +75,7 @@ class BaseArtistModel {
     required this.url,
     this.imageUrl,
     this.listeners,
+    this.shortDescription,
     this.itemType = ItemType.artist,
   });
 
@@ -83,6 +85,7 @@ class BaseArtistModel {
       url: json['url'],
       imageUrl: json['imageUrl'],
       listeners: int.tryParse(json['listeners']),
+      shortDescription: json['shortDescription'],
       itemType: json['itemType'].toString().itemType,
     );
   }
@@ -93,6 +96,7 @@ class BaseArtistModel {
       'url': url,
       'imageUrl': imageUrl,
       'listeners': listeners,
+      'shortDescription': shortDescription,
       'itemType': itemType.name,
     };
   }
@@ -859,6 +863,143 @@ class TagPageModel extends TagModel {
       'moreTracksUrl': moreTracksUrl,
       'relatedTags': relatedTags.map((e) => e.toJson()).toList(),
       'itemType': itemType.name,
+    };
+  }
+}
+
+class TagPageMoreArtistPageModel {
+  final List<BaseArtistModel> artists;
+  final String? nextPageUrl;
+  final String? previousPageUrl;
+  final String? currentPageUrl;
+  final String? firstPageUrl;
+  final String? lastPageUrl;
+  final int totalPages;
+
+  TagPageMoreArtistPageModel({
+    required this.artists,
+    this.nextPageUrl,
+    this.previousPageUrl,
+    this.currentPageUrl,
+    this.firstPageUrl,
+    this.lastPageUrl,
+    this.totalPages = 0,
+  });
+
+  factory TagPageMoreArtistPageModel.fromJson(Map<String, dynamic> json) {
+    return TagPageMoreArtistPageModel(
+      artists: (json['artists'] as List)
+          .map((e) => BaseArtistModel.fromJson(e))
+          .toList(),
+      nextPageUrl: json['nextPageUrl'],
+      previousPageUrl: json['previousPageUrl'],
+      currentPageUrl: json['currentPageUrl'],
+      firstPageUrl: json['firstPageUrl'],
+      lastPageUrl: json['lastPageUrl'],
+      totalPages: int.tryParse(json['totalPages']) ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'artists': artists.map((e) => e.toJson()).toList(),
+      'nextPageUrl': nextPageUrl,
+      'previousPageUrl': previousPageUrl,
+      'currentPageUrl': currentPageUrl,
+      'firstPageUrl': firstPageUrl,
+      'lastPageUrl': lastPageUrl,
+      'totalPages': totalPages,
+    };
+  }
+}
+
+class TagPageMoreAlbumPageModel {
+  final List<BaseAlbumModel> albums;
+  final String? nextPageUrl;
+  final String? previousPageUrl;
+  final String? currentPageUrl;
+  final String? firstPageUrl;
+  final String? lastPageUrl;
+  final int totalPages;
+
+  TagPageMoreAlbumPageModel({
+    required this.albums,
+    this.nextPageUrl,
+    this.previousPageUrl,
+    this.currentPageUrl,
+    this.firstPageUrl,
+    this.lastPageUrl,
+    this.totalPages = 0,
+  });
+
+  factory TagPageMoreAlbumPageModel.fromJson(Map<String, dynamic> json) {
+    return TagPageMoreAlbumPageModel(
+      albums: (json['albums'] as List)
+          .map((e) => BaseAlbumModel.fromJson(e))
+          .toList(),
+      nextPageUrl: json['nextPageUrl'],
+      previousPageUrl: json['previousPageUrl'],
+      currentPageUrl: json['currentPageUrl'],
+      firstPageUrl: json['firstPageUrl'],
+      lastPageUrl: json['lastPageUrl'],
+      totalPages: int.tryParse(json['totalPages']) ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'albums': albums.map((e) => e.toJson()).toList(),
+      'nextPageUrl': nextPageUrl,
+      'previousPageUrl': previousPageUrl,
+      'currentPageUrl': currentPageUrl,
+      'firstPageUrl': firstPageUrl,
+      'lastPageUrl': lastPageUrl,
+      'totalPages': totalPages,
+    };
+  }
+}
+
+class TagPageMoreTrackPageModel {
+  final List<BaseTrackModel> tracks;
+  final String? nextPageUrl;
+  final String? previousPageUrl;
+  final String? currentPageUrl;
+  final String? firstPageUrl;
+  final String? lastPageUrl;
+  final int totalPages;
+
+  TagPageMoreTrackPageModel({
+    required this.tracks,
+    this.nextPageUrl,
+    this.previousPageUrl,
+    this.currentPageUrl,
+    this.firstPageUrl,
+    this.lastPageUrl,
+    this.totalPages = 0,
+  });
+
+  factory TagPageMoreTrackPageModel.fromJson(Map<String, dynamic> json) {
+    return TagPageMoreTrackPageModel(
+      tracks: (json['tracks'] as List)
+          .map((e) => BaseTrackModel.fromJson(e))
+          .toList(),
+      nextPageUrl: json['nextPageUrl'],
+      previousPageUrl: json['previousPageUrl'],
+      currentPageUrl: json['currentPageUrl'],
+      firstPageUrl: json['firstPageUrl'],
+      lastPageUrl: json['lastPageUrl'],
+      totalPages: int.tryParse(json['totalPages']) ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tracks': tracks.map((e) => e.toJson()).toList(),
+      'nextPageUrl': nextPageUrl,
+      'previousPageUrl': previousPageUrl,
+      'currentPageUrl': currentPageUrl,
+      'firstPageUrl': firstPageUrl,
+      'lastPageUrl': lastPageUrl,
     };
   }
 }

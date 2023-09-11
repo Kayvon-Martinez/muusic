@@ -9,11 +9,11 @@ abstract class Provider {
   Future<DetailedArtistModel> getArtist(String url);
   Future<DetailedAlbumModel> getAlbum(String url);
   Future<DetailedTrackModel> getTrack(String url);
-  Future<String> getLyrics(String url);
   Future<TagPageModel> getTag(String url);
-  Future<List<BaseArtistModel>> getTagArtists(String url);
-  Future<List<BaseAlbumModel>> getTagAlbums(String url);
-  Future<List<BaseTrackModel>> getTagTracks(String url);
+  Future<TagPageMoreArtistPageModel> getTagArtists(String url, int? page);
+  Future<TagPageMoreAlbumPageModel> getTagAlbums(String url, int? page);
+  Future<TagPageMoreTrackPageModel> getTagTracks(String url, int? page);
+  Future<String> getLyrics(String url);
   Future<List<EventModel>> getEvents(String url);
   Future<String> extractor(String url);
 }
