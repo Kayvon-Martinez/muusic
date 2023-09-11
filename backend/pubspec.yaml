@@ -17,6 +17,9 @@ dependencies:
   beautiful_soup_dart: ^0.3.0
   dio: ^5.3.2
 
+  # YT
+  youtube_explode_dart: ^2.0.2
+
 dev_dependencies:
   lints: ^2.0.0
   test: ^1.21.0

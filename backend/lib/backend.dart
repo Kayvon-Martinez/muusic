@@ -239,8 +239,28 @@ Future<void> start(
     }
   });
 
-  app.post("$apiPath/:id/extractor",
-      (req, res) => res.json({'message': 'Not implemented'}));
+  app.post("$apiPath/:id/extractor", (req, res) async {
+    res.headers.contentType = ContentType.binary;
+    res.headers.add('Access-Control-Allow-Origin', '*');
+    var body = await req.bodyAsJsonMap;
+    var provider = detectSource(req.params['id']);
+    if (body['url'] == null) {
+      res.json({'error': 'No url provided'});
+      return null;
+    }
+    try {
+      if (provider != null) {
+        var data = await provider.extractor(body['url']) as List<int>;
+        res.setDownload(filename: 'audio.webm');
+        res.add(data);
+      } else {
+        res.json({'error': 'Provider not found'});
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
+    }
+  });
 
   await app.listen(
     port,

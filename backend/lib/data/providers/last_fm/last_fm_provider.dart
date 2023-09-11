@@ -1,4 +1,5 @@
-import 'package:backend/core/utils/date_helpers.dart';
+import "package:backend/core/utils/extractors/youtube_extractor.dart";
+import 'package:backend/core/utils/helpers/date_helpers.dart';
 import "package:backend/core/values/constants.dart";
 import "package:backend/core/values/regex_patterns.dart";
 import "package:backend/data/models/base_models.dart";
@@ -1419,7 +1420,7 @@ class LastFMProvider implements Provider {
   }
 
   @override
-  Future<String> extractor(String url) async {
-    throw UnimplementedError();
+  Future<List<int>> extractor(String url) async {
+    return (await getYTVideoAudioData(url));
   }
 }
