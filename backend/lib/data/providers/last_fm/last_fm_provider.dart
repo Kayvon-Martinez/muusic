@@ -1040,6 +1040,18 @@ class LastFMProvider implements Provider {
   }
 
   @override
+  Future<String> getLyrics(String url) async {
+    var response = await DioClient().client.get(Uri.decodeComponent(url));
+    var soup = BeautifulSoup(response.data);
+    var lyricPars = soup.findAll("p.lyrics-paragraph");
+    String lyrics = "";
+    for (var element in lyricPars) {
+      lyrics += "${element.text.trim()}\n\n";
+    }
+    return lyrics;
+  }
+
+  @override
   Future<List<BaseArtistModel>> getTagArtists(String url) async {
     throw UnimplementedError();
   }
