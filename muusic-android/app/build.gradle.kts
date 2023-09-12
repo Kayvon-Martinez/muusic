@@ -1,16 +1,18 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.dagger.hilt.android")
+    kotlin("kapt")
 }
 
 android {
     namespace = "app.kyushu.muusic"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "app.kyushu.muusic"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -30,11 +32,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -46,6 +48,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    hilt {
+        enableAggregatingTask = true
     }
 }
 
@@ -66,4 +71,55 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // AppCompat
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    // Coroutine
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
+
+    // Coroutine Lifecycle Scopes
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+
+    // Dagger
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+
+    // Coil
+    implementation("io.coil-kt:coil:2.4.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+    // Voyager
+    val voyagerVersion = "1.0.0-rc07"
+    // Android ViewModel integration
+    implementation("cafe.adriel.voyager:voyager-androidx:$voyagerVersion")
+    // Koin integration
+    implementation("cafe.adriel.voyager:voyager-koin:$voyagerVersion")
+    // Hilt integration
+    implementation("cafe.adriel.voyager:voyager-hilt:$voyagerVersion")
+    // LiveData integration
+    implementation("cafe.adriel.voyager:voyager-livedata:$voyagerVersion")
+
+    // Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // Material Icons
+    implementation("androidx.compose.material:material:1.5.0")
+
+    // Palette
+    //noinspection GradleCompatible
+    implementation("com.android.support:palette-v7:28.0.0")
+}
+
+kapt {
+    correctErrorTypes = true
 }

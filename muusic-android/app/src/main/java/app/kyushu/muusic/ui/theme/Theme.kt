@@ -18,12 +18,15 @@ import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF6F11DB),
-    secondary = PurpleGrey40,
-    tertiary = Pink80,
     onPrimary = Color.White,
+    secondary = PurpleGrey40,
     onSecondary = Color(0xFFfefefe),
+    tertiary = Pink80,
+    onTertiary = Color(0xFFfefefe),
     background = Color(0xFF000000),
+    onBackground = Color.White,
     surface = Color(0xFF1e1e1e),
+    onSurface = Color(0xFFfefefe),
     error = Color(0xFFB90000),
     onError = Color.White
 )
@@ -31,7 +34,14 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = Color(0xFF6F11DB),
     secondary = PurpleGrey40,
-    tertiary = Pink40
+    tertiary = Pink40,
+    onTertiary = Color(0xFFfefefe),
+    background = Color(0xFFFFFBFE),
+    onBackground = Color.White,
+    surface = Color(0xFFC2C2C2),
+    onSurface = Color(0xFF131313),
+    error = Color(0xFFB90000),
+    onError = Color.White
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -64,8 +74,9 @@ fun MuusicTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
