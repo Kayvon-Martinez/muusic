@@ -108,6 +108,8 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-hilt:$voyagerVersion")
     // LiveData integration
     implementation("cafe.adriel.voyager:voyager-livedata:$voyagerVersion")
+    // Navigator
+    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
 
     // Timber
     implementation("com.jakewharton.timber:timber:5.0.1")
