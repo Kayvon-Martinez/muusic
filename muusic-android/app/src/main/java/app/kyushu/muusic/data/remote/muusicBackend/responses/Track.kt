@@ -10,6 +10,6 @@ data class Track(
     val listeners: Any?,
     val name: String,
     val number: Any?,
-    val source: app.kyushu.muusic.data.remote.muusicBackend.responses.Source,
+    val source: Source,
     val url: String
 )

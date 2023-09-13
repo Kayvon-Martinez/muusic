@@ -18,9 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import app.kyushu.muusic.screens.home.view.HomeScreen
 import app.kyushu.muusic.screens.search.view.SearchScreen
 import app.kyushu.muusic.ui.theme.MuusicTheme
@@ -49,8 +47,8 @@ class MainActivity : ComponentActivity() {
                         },
                         bottomBar = {
                             NavigationBar(
-                                modifier = Modifier,
                                 containerColor = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier,
                             ) {
                                 BottomNavigationBarItem(
                                     screen = HomeScreen,

@@ -10,6 +10,6 @@ data class SimilarTrack(
     val listeners: Any?,
     val name: String,
     val number: Any?,
-    val source: app.kyushu.muusic.data.remote.muusicBackend.responses.SourceXXXX,
+    val source: SourceXXXX,
     val url: String
 )

@@ -8,10 +8,10 @@ data class TagDetails(
     val moreArtistsUrl: String,
     val moreTracksUrl: String,
     val name: String,
-    val relatedTags: List<app.kyushu.muusic.data.remote.muusicBackend.responses.RelatedTag>,
-    val similarTags: List<app.kyushu.muusic.data.remote.muusicBackend.responses.SimilarTag>,
-    val topAlbums: List<app.kyushu.muusic.data.remote.muusicBackend.responses.TopAlbum>,
-    val topArtists: List<app.kyushu.muusic.data.remote.muusicBackend.responses.TopArtist>,
-    val topTracks: List<app.kyushu.muusic.data.remote.muusicBackend.responses.TopTrackX>,
+    val relatedTags: List<RelatedTag>,
+    val similarTags: List<SimilarTag>,
+    val topAlbums: List<TopAlbum>,
+    val topArtists: List<TopArtist>,
+    val topTracks: List<TopTrackX>,
     val url: String
 )

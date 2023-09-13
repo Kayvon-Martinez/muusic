@@ -10,6 +10,6 @@ data class TopTrackX(
     val listeners: Any?,
     val name: String,
     val number: Any?,
-    val source: app.kyushu.muusic.data.remote.muusicBackend.responses.SourceXXX,
+    val source: SourceXXX,
     val url: String
 )

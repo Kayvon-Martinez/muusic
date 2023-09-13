@@ -10,6 +10,6 @@ data class PopularThisWeek(
     val listeners: Int,
     val name: String,
     val number: Any?,
-    val source: app.kyushu.muusic.data.remote.muusicBackend.responses.SourceX,
+    val source: SourceX,
     val url: String
 )

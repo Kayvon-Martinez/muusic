@@ -7,5 +7,5 @@ data class TagTrackPage(
     val nextPageUrl: String,
     val previousPageUrl: String,
     val totalPages: Int,
-    val tracks: List<app.kyushu.muusic.data.remote.muusicBackend.responses.TrackXX>
+    val tracks: List<TrackXX>
 )

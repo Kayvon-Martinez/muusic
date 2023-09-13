@@ -1,7 +1,7 @@
 package app.kyushu.muusic.data.remote.muusicBackend.responses
 
 data class TagArtistPage(
-    val artists: List<app.kyushu.muusic.data.remote.muusicBackend.responses.ArtistX>,
+    val artists: List<ArtistX>,
     val currentPageUrl: String,
     val firstPageUrl: String,
     val lastPageUrl: String,
