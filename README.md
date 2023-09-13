@@ -92,7 +92,7 @@ The api is served on http://localhost:8080/api/v1
 
 | Parameter | Type     | Description                       | Parameter Type |
 | :-------- | :------- | :-------------------------------- | :------- |
-| `url`      | `string` | **Required**. Url for album from items with itemType *Album* || Json |
+| `url`      | `string` | **Required**. Url for album from items with itemType *Album* | Json |
 
 #### Get track details
 
@@ -102,7 +102,7 @@ The api is served on http://localhost:8080/api/v1
 
 | Parameter | Type     | Description                       | Parameter Type |
 | :-------- | :------- | :-------------------------------- | :------- |
-| `url`      | `string` | **Required**. Url for track from items with itemType *Track* || Json |
+| `url`      | `string` | **Required**. Url for track from items with itemType *Track* | Json |
 
 #### Get tag details
 
@@ -112,7 +112,7 @@ The api is served on http://localhost:8080/api/v1
 
 | Parameter | Type     | Description                       | Parameter Type |
 | :-------- | :------- | :-------------------------------- | :------- |
-| `url`      | `string` | **Required**. Url for tag from items with itemType *Tag* || Json |
+| `url`      | `string` | **Required**. Url for tag from items with itemType *Tag* | Json |
 
 #### Get tag artists (paginated)
 
@@ -134,7 +134,7 @@ The api is served on http://localhost:8080/api/v1
 
 | Parameter | Type     | Description                       | Parameter Type |
 | :-------- | :------- | :-------------------------------- | :------- |
-| `url`      | `string` | **Required**. Url for tag from items with itemType *Tag* || Json |
+| `url`      | `string` | **Required**. Url for tag from items with itemType *Tag* | Json |
 | `page`      | `int` | **Optional**. Page number to request. Default is 1  | Json |
 
 #### Get tag tracks (paginated)
@@ -145,7 +145,7 @@ The api is served on http://localhost:8080/api/v1
 
 | Parameter | Type     | Description                       | Parameter Type |
 | :-------- | :------- | :-------------------------------- | :------- |
-| `url`      | `string` | **Required**. Url for tag from items with itemType *Tag* || Json |
+| `url`      | `string` | **Required**. Url for tag from items with itemType *Tag* | Json |
 | `page`      | `int` | **Optional**. Page number to request. Default is 1  | Json |
 
 #### Get lyrics (paginated)
@@ -156,7 +156,7 @@ The api is served on http://localhost:8080/api/v1
 
 | Parameter | Type     | Description                       | Parameter Type |
 | :-------- | :------- | :-------------------------------- | :------- |
-| `url`      | `string` | **Required**. Url for lyrics from lyricsUrl in track details|| Json |
+| `url`      | `string` | **Required**. Url for lyrics from lyricsUrl in track details| Json |
 
 #### Get an artist's events (paginated)
 
@@ -166,7 +166,7 @@ The api is served on http://localhost:8080/api/v1
 
 | Parameter | Type     | Description                       | Parameter Type |
 | :-------- | :------- | :-------------------------------- | :------- |
-| `url`      | `string` | **Required**. Url for lyrics from eventsUrl in artist details|| Json |
+| `url`      | `string` | **Required**. Url for lyrics from eventsUrl in artist details| Json |
 
 
 #### Get extracted song info (paginated)
