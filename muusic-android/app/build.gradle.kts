@@ -120,6 +120,12 @@ dependencies {
     // Palette
     //noinspection GradleCompatible
     implementation("com.android.support:palette-v7:28.0.0")
+
+    // Room
+    val roomVersion = "2.5.2"
+
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
 }
 
 kapt {

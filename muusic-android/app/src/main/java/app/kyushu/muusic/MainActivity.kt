@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import app.kyushu.muusic.screens.home.view.HomeScreen
+import app.kyushu.muusic.screens.search.view.SearchScreen
 import app.kyushu.muusic.ui.theme.MuusicTheme
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.CurrentScreen
@@ -37,6 +39,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Navigator(
                     screens = listOf(
+                        SearchScreen,
                         HomeScreen,
                     )
                 ) { _ ->
@@ -53,6 +56,11 @@ class MainActivity : ComponentActivity() {
                                     screen = HomeScreen,
                                     imageVector = Icons.Default.Home,
                                     label = "Home"
+                                )
+                                BottomNavigationBarItem(
+                                    screen = SearchScreen,
+                                    imageVector = Icons.Default.Search,
+                                    label = "Search"
                                 )
                             }
                         }
@@ -74,5 +82,8 @@ private fun RowScope.BottomNavigationBarItem(screen: Screen, imageVector: ImageV
         onClick = { if (!selected) navigator.push(screen) },
         icon = { Icon(imageVector = imageVector, contentDescription = label) },
         label = { Text(text = label) },
+        colors = NavigationBarItemDefaults.colors(
+            indicatorColor = MaterialTheme.colorScheme.primary,
+        )
     )
 }
