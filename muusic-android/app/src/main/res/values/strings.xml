@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Muusic</string>
-    <string name="search_hint">Search for an artist, album, or song</string>
+    <string name="search_hint">Search…</string>
 </resources>

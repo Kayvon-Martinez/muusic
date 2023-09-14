@@ -16,10 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -92,7 +88,7 @@ fun RecentlyPlayedItemsItem(item: Any, modifier: Modifier = Modifier) {
     Surface(
         color = MaterialTheme.colorScheme.surface,
         modifier = modifier
-            .height(100.dp)
+            .height(120.dp)
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium),
     ) {
@@ -123,7 +119,7 @@ fun RecentlyPlayedItemsItem(item: Any, modifier: Modifier = Modifier) {
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                fontSize = TextUnit(20f, TextUnitType.Sp),
+                                fontSize = TextUnit(18f, TextUnitType.Sp),
                                 fontWeight = FontWeight(800),
                             ),
                         )
@@ -146,27 +142,32 @@ fun RecentlyPlayedItemsItem(item: Any, modifier: Modifier = Modifier) {
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                fontSize = TextUnit(20f, TextUnitType.Sp),
+                                fontSize = TextUnit(18f, TextUnitType.Sp),
                                 fontWeight = FontWeight(800),
                             ),
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = item.artistName,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = TextUnit(16f, TextUnitType.Sp),
+                                fontSize = TextUnit(14f, TextUnitType.Sp),
                                 fontWeight = FontWeight(600),
                             ),
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        if (item.numberOfTracks != null)
-                        Text(
-                            text = "${item.numberOfTracks} tracks",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = TextUnit(14f, TextUnitType.Sp),
-                                fontWeight = FontWeight(500),
-                            ),
-                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        if (item.numberOfTracks != null) {
+                            Text(
+                                text = "${item.numberOfTracks} tracks",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = TextUnit(12f, TextUnitType.Sp),
+                                    fontWeight = FontWeight(500),
+                                ),
+                            )
+                        }
                     }
                 }
                 is Track -> {
@@ -186,27 +187,32 @@ fun RecentlyPlayedItemsItem(item: Any, modifier: Modifier = Modifier) {
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyLarge.copy(
-                                fontSize = TextUnit(20f, TextUnitType.Sp),
+                                fontSize = TextUnit(18f, TextUnitType.Sp),
                                 fontWeight = FontWeight(800),
                             ),
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = item.artistName,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = TextUnit(16f, TextUnitType.Sp),
+                                fontSize = TextUnit(14f, TextUnitType.Sp),
                                 fontWeight = FontWeight(600),
                             ),
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        if (item.albumName != null)
-                        Text(
-                            text = item.albumName,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = TextUnit(14f, TextUnitType.Sp),
-                                fontWeight = FontWeight(500),
-                            ),
-                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        if (item.albumName != null) {
+                            Text(
+                                text = item.albumName,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = TextUnit(12f, TextUnitType.Sp),
+                                    fontWeight = FontWeight(500),
+                                ),
+                            )
+                        }
                     }
                 }
             }
