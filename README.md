@@ -53,7 +53,7 @@ An unofficial last.fm client made with dart and kotlin
   // MacOs/Linux
   cd backend
   dart compile exe ./bin/backend.dart
-  ./bin/backend
+  ./bin/backend.exe
 ```
 
 #### How to run the Android app:
