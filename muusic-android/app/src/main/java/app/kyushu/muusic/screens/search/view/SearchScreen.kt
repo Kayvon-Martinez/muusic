@@ -9,7 +9,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.kyushu.muusic.data.remote.muusicBackend.responses.Album
+import app.kyushu.muusic.data.remote.muusicBackend.responses.Artist
+import app.kyushu.muusic.data.remote.muusicBackend.responses.Source
 import app.kyushu.muusic.data.remote.muusicBackend.responses.TagDetails
+import app.kyushu.muusic.data.remote.muusicBackend.responses.Track
+import app.kyushu.muusic.screens.search.composables.RecentlyPlayedItems
 import app.kyushu.muusic.screens.search.composables.SearchBar
 import app.kyushu.muusic.screens.search.composables.TopTags
 import app.kyushu.muusic.util.hipHopTagImageUrl
@@ -36,6 +41,44 @@ object SearchScreen: Screen {
             ),
         )
 
+        val items: List<Any> = listOf(
+            Artist(
+                imageUrl = "https://lastfm.freetls.fastly.net/i/u/300x300/d35c21d3b74c79c7f71ecb9ec13d5ec3.jpg",
+                itemType = "Artist",
+                listeners = 1621034,
+                name = "Lil Uzi Vert",
+                shortDescription = null,
+                url = "https://www.last.fm/music/Lil+Uzi+Vert"
+            ),
+            Album(
+                artistName = "Lil Uzi Vert",
+                artistUrl = "https://www.last.fm/music/Lil+Uzi+Vert",
+                imageUrl = "https://lastfm.freetls.fastly.net/i/u/300x300/50f8bdf6b97cce0c9edd4a46f60079e8.jpg",
+                itemType = "Album",
+                listeners = null,
+                name = "Lil Uzi Vert vs. the World",
+                numberOfTracks = null,
+                releaseDate = "20 Apr 2016, 00:00",
+                url = "https://www.last.fm/music/Lil+Uzi+Vert/Lil+Uzi+Vert+vs.+the+World"
+            ),
+            Track(
+                albumName = "XO TOUR Llif3",
+                artistName = "Lil Uzi Vert",
+                artistUrl = "https://www.last.fm/music/Lil+Uzi+Vert",
+                duration = null,
+                imageUrl = "https://lastfm.freetls.fastly.net/i/u/64s/b0531f821fe3d89f0081f6de2437fbe4.jpg",
+                itemType = "Track",
+                listeners = null,
+                name = "XO TOUR Llif3",
+                number = null,
+                source = Source(
+                    url = "https://www.youtube.com/watch?v=WrsFXgQk5UI",
+                    extractorUrl = "/api/v1/extractor",
+                ),
+                url = "https://www.last.fm/music/Lil+Uzi+Vert/_/XO+TOUR+Llif3"
+            )
+        )
+
         Surface(
             color = MaterialTheme.colorScheme.background,
             modifier = Modifier
@@ -50,6 +93,8 @@ object SearchScreen: Screen {
                 )
                 Spacer(modifier = Modifier.padding(16.dp))
                 TopTags(tags = tags)
+                Spacer(modifier = Modifier.padding(16.dp))
+                RecentlyPlayedItems(items = items)
             }
         }
     }

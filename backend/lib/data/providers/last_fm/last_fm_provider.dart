@@ -85,7 +85,7 @@ class LastFMProvider implements Provider {
         element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
     var sourceUrl =
         element.find("td.chartlist-play > a")?.attributes["href"]?.trim();
-    String extractorUrl = "/api/v1/last_fm/extractor";
+    String extractorUrl = "/api/v1/extractor";
     RawSongSource? source = sourceUrl != null
         ? RawSongSource(
             url: sourceUrl,
@@ -177,7 +177,7 @@ class LastFMProvider implements Provider {
         element.find("td.chartlist-name > a")!.attributes["href"]!.trim();
     var sourceUrl =
         element.find("td.chartlist-play > a")?.attributes["href"]?.trim();
-    String extractorUrl = "/api/v1/last_fm/extractor";
+    String extractorUrl = "/api/v1/extractor";
     RawSongSource? source = sourceUrl != null
         ? RawSongSource(
             url: sourceUrl,
@@ -499,7 +499,7 @@ class LastFMProvider implements Provider {
         element.find("td.chartlist-name > a")!.attributes["href"]!.trim();
     var sourceUrl =
         element.find("td.chartlist-play > a")?.attributes["href"]?.trim();
-    String extractorUrl = "/api/v1/last_fm/extractor";
+    String extractorUrl = "/api/v1/extractor";
     RawSongSource? source = sourceUrl != null
         ? RawSongSource(
             url: sourceUrl,
@@ -693,7 +693,7 @@ class LastFMProvider implements Provider {
         .find("a.track-similar-tracks-item-playlink")
         ?.attributes["href"]
         ?.trim();
-    String extractorUrl = "/api/v1/last_fm/extractor";
+    String extractorUrl = "/api/v1/extractor";
     RawSongSource? source = sourceUrl != null
         ? RawSongSource(
             url: sourceUrl,
@@ -747,7 +747,7 @@ class LastFMProvider implements Provider {
         url.split("/").sublist(0, url.split("/").length - 2).join("/");
     var sourceUrl =
         soup.find("a.header-new-playlink")?.attributes["href"]?.trim();
-    String extractorUrl = "/api/v1/last_fm/extractor";
+    String extractorUrl = "/api/v1/extractor";
     RawSongSource? source = sourceUrl != null
         ? RawSongSource(
             url: sourceUrl,
@@ -936,7 +936,7 @@ class LastFMProvider implements Provider {
         element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
     var sourceUrl =
         element.find("td.chartlist-play > a")?.attributes["href"]?.trim();
-    String extractorUrl = "/api/v1/last_fm/extractor";
+    String extractorUrl = "/api/v1/extractor";
     RawSongSource? source = sourceUrl != null
         ? RawSongSource(
             url: sourceUrl,
@@ -1291,7 +1291,7 @@ class LastFMProvider implements Provider {
         element.find("td.chartlist-artist > a")!.attributes["href"]!.trim();
     var sourceUrl =
         element.find("td.chartlist-play > a")?.attributes["href"]?.trim();
-    String extractorUrl = "/api/v1/last_fm/extractor";
+    String extractorUrl = "/api/v1/extractor";
     RawSongSource? source = sourceUrl != null
         ? RawSongSource(
             url: sourceUrl,

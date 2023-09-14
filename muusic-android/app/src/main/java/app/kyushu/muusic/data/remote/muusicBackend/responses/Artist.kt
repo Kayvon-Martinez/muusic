@@ -5,6 +5,6 @@ data class Artist(
     val itemType: String,
     val listeners: Int,
     val name: String,
-    val shortDescription: Any?,
+    val shortDescription: String?,
     val url: String
 )

@@ -16,9 +16,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import app.kyushu.muusic.screens.home.view.HomeScreen
 import app.kyushu.muusic.screens.search.view.SearchScreen
 import app.kyushu.muusic.ui.theme.MuusicTheme
@@ -33,7 +35,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MuusicTheme {
+            MuusicTheme(dynamicColor = false) {
                 // A surface container using the 'background' color from the theme
                 Navigator(
                     screens = listOf(
@@ -48,6 +50,7 @@ class MainActivity : ComponentActivity() {
                         bottomBar = {
                             NavigationBar(
                                 containerColor = MaterialTheme.colorScheme.surface,
+                                tonalElevation = 0.dp,
                                 modifier = Modifier,
                             ) {
                                 BottomNavigationBarItem(

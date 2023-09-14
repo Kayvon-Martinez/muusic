@@ -5,9 +5,9 @@ data class Album(
     val artistUrl: String,
     val imageUrl: String,
     val itemType: String,
-    val listeners: Any?,
+    val listeners: Int?,
     val name: String,
-    val numberOfTracks: Any?,
-    val releaseDate: Any?,
+    val numberOfTracks: Int?,
+    val releaseDate: String?,
     val url: String
 )
