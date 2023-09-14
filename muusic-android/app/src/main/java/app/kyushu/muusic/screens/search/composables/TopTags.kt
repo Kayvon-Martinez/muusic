@@ -46,7 +46,10 @@ fun TopTags(tags: List<TagDetails>, modifier: Modifier = Modifier) {
     ) {
         Text(
             text = "Your Top Tags",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = TextUnit(20f, TextUnitType.Sp),
+                fontWeight = FontWeight(700),
+            )
         )
         Spacer(modifier = Modifier.height(16.dp))
         LazyHorizontalGrid(
