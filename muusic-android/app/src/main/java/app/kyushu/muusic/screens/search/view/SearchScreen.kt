@@ -1,9 +1,11 @@
 package app.kyushu.muusic.screens.search.view
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -85,18 +87,19 @@ object SearchScreen: Screen {
                 .fillMaxSize()
                 .padding(vertical = 12.dp, horizontal = 8.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
-                item {
+
                     SearchBar(
                     onSearch = {  }
                 )
-                }
-                item {Spacer(modifier = Modifier.padding(12.dp))}
-                item {TopTags(tags = tags)}
-                item {Spacer(modifier = Modifier.padding(12.dp))}
-                item {RecentlyPlayedItems(items = items)}
+                Spacer(modifier = Modifier.padding(12.dp))
+                TopTags(tags = tags)
+                Spacer(modifier = Modifier.padding(12.dp))
+                RecentlyPlayedItems(items = items)
             }
         }
     }

@@ -70,12 +70,13 @@ Future<void> start(
       res.json({'error': 'No url provided'});
       return;
     }
-    // try {
-    var results = await provider.getTrack(body['url']);
-    res.json(results.toJson()); // } catch (e) {
-    //   res.statusCode = 500;
-    //   res.json({'error': e.toString()});
-    // }
+    try {
+      var results = await provider.getTrack(body['url']);
+      res.json(results.toJson());
+    } catch (e) {
+      res.statusCode = 500;
+      res.json({'error': e.toString()});
+    }
   });
 
   app.post("$apiPath/details/tag", (req, res) async {
