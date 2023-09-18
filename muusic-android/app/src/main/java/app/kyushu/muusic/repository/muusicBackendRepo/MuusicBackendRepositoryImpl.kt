@@ -30,45 +30,45 @@ class MuusicBackendRepositoryImpl @Inject constructor(
         return json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
     }
 
-    override suspend fun getSearchResults(source: String, query: String): Resource<SearchResults> {
+    override suspend fun getSearchResults(query: String): Resource<SearchResults> {
         return try {
-            val response = muusicBackendApi.search(source, query)
+            val response = muusicBackendApi.search(query)
             Resource.Success(response)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun getArtistDetails(source: String, url: String): Resource<ArtistDetails> {
+    override suspend fun getArtistDetails(url: String): Resource<ArtistDetails> {
         return try {
-            val response = muusicBackendApi.artistDetails(source, createJsonRequestBody("url" to url))
+            val response = muusicBackendApi.artistDetails(createJsonRequestBody("url" to url))
             Resource.Success(response)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun getAlbumDetails(source: String, url: String): Resource<AlbumDetails> {
+    override suspend fun getAlbumDetails(url: String): Resource<AlbumDetails> {
         return try {
-            val response = muusicBackendApi.albumDetails(source, createJsonRequestBody("url" to url))
+            val response = muusicBackendApi.albumDetails(createJsonRequestBody("url" to url))
             Resource.Success(response)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun getTrackDetails(source: String, url: String): Resource<TrackDetails> {
+    override suspend fun getTrackDetails(url: String): Resource<TrackDetails> {
         return try {
-            val response = muusicBackendApi.trackDetails(source, createJsonRequestBody("url" to url))
+            val response = muusicBackendApi.trackDetails(createJsonRequestBody("url" to url))
             Resource.Success(response)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun getTagDetails(source: String, url: String): Resource<TagDetails> {
+    override suspend fun getTagDetails(url: String): Resource<TagDetails> {
         return try {
-            val response = muusicBackendApi.tagDetails(source, createJsonRequestBody("url" to url))
+            val response = muusicBackendApi.tagDetails(createJsonRequestBody("url" to url))
             Resource.Success(response)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
@@ -76,13 +76,12 @@ class MuusicBackendRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getTagArtistsPage(
-        source: String,
         url: String,
         page: Int
     ): Resource<TagArtistPage> {
         return try {
             val response = muusicBackendApi.tagArtists(
-                source,
+
                 createJsonRequestBody("url" to url, "page" to page)
             )
             Resource.Success(response)
@@ -92,13 +91,12 @@ class MuusicBackendRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getTagAlbumsPage(
-        source: String,
         url: String,
         page: Int
     ): Resource<TagAlbumPage> {
         return try {
             val response = muusicBackendApi.artistAlbums(
-                source,
+
                 createJsonRequestBody("url" to url, "page" to page)
             )
             Resource.Success(response)
@@ -108,13 +106,12 @@ class MuusicBackendRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getTagTracksPage(
-        source: String,
         url: String,
         page: Int
     ): Resource<TagTrackPage> {
         return try {
             val response = muusicBackendApi.tagTracks(
-                source,
+
                 createJsonRequestBody("url" to url, "page" to page)
             )
             Resource.Success(response)
@@ -123,9 +120,9 @@ class MuusicBackendRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLyrics(source: String, url: String): Resource<Lyrics> {
+    override suspend fun getLyrics(url: String): Resource<Lyrics> {
         return try {
-            val response = muusicBackendApi.lyrics(source, createJsonRequestBody("url" to url))
+            val response = muusicBackendApi.lyrics(createJsonRequestBody("url" to url))
             Resource.Success(response)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
@@ -133,12 +130,11 @@ class MuusicBackendRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getArtistEventsPage(
-        source: String,
         url: String,
     ): Resource<ArtistEventsPage> {
         return try {
             val response = muusicBackendApi.events(
-                source,
+
                 createJsonRequestBody("url" to url)
             )
             Resource.Success(response)
@@ -147,9 +143,9 @@ class MuusicBackendRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getExtractedSong(source: String, url: String): Resource<ExtractedSong> {
+    override suspend fun getExtractedSong(url: String): Resource<ExtractedSong> {
         return try {
-            val response = muusicBackendApi.extractor(source, createJsonRequestBody("url" to url))
+            val response = muusicBackendApi.extractor(createJsonRequestBody("url" to url))
             Resource.Success(response)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")

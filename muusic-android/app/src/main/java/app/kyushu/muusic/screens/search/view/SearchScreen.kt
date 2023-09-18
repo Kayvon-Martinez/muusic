@@ -19,12 +19,17 @@ import app.kyushu.muusic.data.remote.muusicBackend.responses.Track
 import app.kyushu.muusic.screens.search.composables.RecentlyPlayedItems
 import app.kyushu.muusic.screens.search.composables.SearchBar
 import app.kyushu.muusic.screens.search.composables.TopTags
+import app.kyushu.muusic.screens.search.viewModel.SearchViewModel
 import app.kyushu.muusic.util.hipHopTagImageUrl
-import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.androidx.AndroidScreen
+import cafe.adriel.voyager.hilt.getViewModel
 
-object SearchScreen: Screen {
+object SearchScreen: AndroidScreen() {
+
     @Composable
     override fun Content() {
+        val viewModel = getViewModel<SearchViewModel>()
+
         val tags: List<TagDetails> = listOf(
             TagDetails(
                 description = "Hip Hop",
@@ -94,12 +99,20 @@ object SearchScreen: Screen {
             ) {
 
                     SearchBar(
-                    onSearch = {  }
+                    onSearch = {
+                        viewModel.searchQuery = it
+                        viewModel.search()
+                    }
                 )
-                Spacer(modifier = Modifier.padding(12.dp))
-                TopTags(tags = tags)
-                Spacer(modifier = Modifier.padding(12.dp))
-                RecentlyPlayedItems(items = items)
+                if (viewModel.searchResults.value == null) {
+                    Spacer(modifier = Modifier.padding(12.dp))
+                    TopTags(tags = tags)
+                    Spacer(modifier = Modifier.padding(12.dp))
+                    RecentlyPlayedItems(items = items)
+                } else {
+                    Spacer(modifier = Modifier.padding(12.dp))
+                    RecentlyPlayedItems(items = viewModel.searchResults.value!!.artists)
+                }
             }
         }
     }

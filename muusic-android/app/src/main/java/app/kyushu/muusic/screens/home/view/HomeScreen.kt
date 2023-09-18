@@ -22,7 +22,7 @@ object HomeScreen: Screen {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "Home Screen", color = MaterialTheme.colorScheme.onBackground)
+                Text(text = "(No Saved Items)", color = MaterialTheme.colorScheme.onBackground)
             }
         }
     }

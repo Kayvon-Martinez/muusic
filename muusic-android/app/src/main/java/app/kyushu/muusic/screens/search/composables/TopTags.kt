@@ -57,7 +57,7 @@ fun TopTags(tags: List<TagDetails>, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             content = {
-                items(4) { index ->
+                items(4) { _ ->
                     TagItem(tag = tags[0])
                 }
             },

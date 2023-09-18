@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -23,7 +24,8 @@ object AppModule {
     @Provides
     fun provideMuusicBackendApi(): MuusicBackendApi {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.157/api/v1/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl("http://10.0.2.2:8080/api/v1/")
             .build()
             .create(MuusicBackendApi::class.java)
     }

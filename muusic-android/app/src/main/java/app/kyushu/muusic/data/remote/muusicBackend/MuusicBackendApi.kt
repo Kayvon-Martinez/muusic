@@ -18,69 +18,58 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface MuusicBackendApi {
-    @GET("{source}/search/{query}")
+    @GET("search/{query}")
     suspend fun search(
-        @Path("source") source: String,
         @Path("query") query: String
     ): SearchResults
 
-    @POST("{source}/details/artist")
+    @POST("details/artist")
     suspend fun artistDetails(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): ArtistDetails
 
-    @POST("{source}/details/album")
+    @POST("details/album")
     suspend fun albumDetails(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): AlbumDetails
 
-    @POST("{source}/details/track")
+    @POST("details/track")
     suspend fun trackDetails(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): TrackDetails
 
-    @POST("{source}/details/tag")
+    @POST("details/tag")
     suspend fun tagDetails(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): TagDetails
 
-    @POST("{source}/tag/artists")
+    @POST("tag/artists")
     suspend fun tagArtists(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): TagArtistPage
 
-    @POST("{source}/tag/albums")
+    @POST("tag/albums")
     suspend fun artistAlbums(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): TagAlbumPage
 
-    @POST("{source}/tag/tracks")
+    @POST("tag/tracks")
     suspend fun tagTracks(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): TagTrackPage
 
-    @POST("{source}/lyrics")
+    @POST("lyrics")
     suspend fun lyrics(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): Lyrics
 
-    @POST("{source}/events")
+    @POST("events")
     suspend fun events(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): ArtistEventsPage
 
-    @POST("{source}/extractor")
+    @POST("extractor")
     suspend fun extractor(
-        @Path("source") source: String,
         @Body params: RequestBody
     ): ExtractedSong
 }

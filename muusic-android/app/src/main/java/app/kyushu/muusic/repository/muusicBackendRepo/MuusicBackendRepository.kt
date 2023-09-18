@@ -14,16 +14,16 @@ import app.kyushu.muusic.data.remote.muusicBackend.responses.TrackDetails
 import app.kyushu.muusic.util.Resource
 
 interface MuusicBackendRepository {
-    suspend fun getSearchResults(source: String, query: String): Resource<SearchResults>
-    suspend fun getArtistDetails(source: String, url: String): Resource<ArtistDetails>
-    suspend fun getAlbumDetails(source: String, url: String): Resource<AlbumDetails>
-    suspend fun getTrackDetails(source: String, url: String): Resource<TrackDetails>
-    suspend fun getTagDetails(source: String, url: String): Resource<TagDetails>
-    suspend fun getTagArtistsPage(source: String, url: String, page: Int): Resource<TagArtistPage>
-    suspend fun getTagAlbumsPage(source: String, url: String, page: Int): Resource<TagAlbumPage>
-    suspend fun getTagTracksPage(source: String, url: String, page: Int): Resource<TagTrackPage>
-    suspend fun getLyrics(source: String, url: String): Resource<Lyrics>
-    suspend fun getArtistEventsPage(source: String, url: String): Resource<ArtistEventsPage>
-    suspend fun getExtractedSong(source: String, url: String): Resource<ExtractedSong>
+    suspend fun getSearchResults(query: String): Resource<SearchResults>
+    suspend fun getArtistDetails(url: String): Resource<ArtistDetails>
+    suspend fun getAlbumDetails(url: String): Resource<AlbumDetails>
+    suspend fun getTrackDetails(url: String): Resource<TrackDetails>
+    suspend fun getTagDetails(url: String): Resource<TagDetails>
+    suspend fun getTagArtistsPage(url: String, page: Int): Resource<TagArtistPage>
+    suspend fun getTagAlbumsPage(url: String, page: Int): Resource<TagAlbumPage>
+    suspend fun getTagTracksPage(url: String, page: Int): Resource<TagTrackPage>
+    suspend fun getLyrics(url: String): Resource<Lyrics>
+    suspend fun getArtistEventsPage(url: String): Resource<ArtistEventsPage>
+    suspend fun getExtractedSong(url: String): Resource<ExtractedSong>
 
 }
