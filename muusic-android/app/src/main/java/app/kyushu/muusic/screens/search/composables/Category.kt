@@ -39,13 +39,13 @@ import app.kyushu.muusic.data.remote.muusicBackend.responses.Track
 import coil.compose.AsyncImage
 
 @Composable
-fun RecentlyPlayedItems(items: List<Any>, modifier: Modifier = Modifier) {
+fun Category(categoryName: String, items: List<Any>, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth(),
     ) {
         Text(
-            text = "Recently Played",
+            text = categoryName,
             style = MaterialTheme.typography.titleMedium.copy(
                 fontSize = TextUnit(20f, TextUnitType.Sp),
                 fontWeight = FontWeight(700),
@@ -56,7 +56,7 @@ fun RecentlyPlayedItems(items: List<Any>, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             content = {
                 for (item in items) {
-                    RecentlyPlayedItemsItem(item = item)
+                    CategoryItem(item = item)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -65,7 +65,7 @@ fun RecentlyPlayedItems(items: List<Any>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun RecentlyPlayedItemsItem(item: Any, modifier: Modifier = Modifier) {
+fun CategoryItem(item: Any, modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val offset: Float by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -88,7 +88,7 @@ fun RecentlyPlayedItemsItem(item: Any, modifier: Modifier = Modifier) {
     Surface(
         color = MaterialTheme.colorScheme.surface,
         modifier = modifier
-            .height(120.dp)
+            .height(150.dp)
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium),
     ) {

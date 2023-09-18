@@ -45,7 +45,10 @@ fun SearchBar(onSearch: (String) -> Unit, modifier: Modifier = Modifier) {
         },
         trailingIcon = {
             if (text.isNotEmpty()) {
-                IconButton(onClick = { text = "" }) {
+                IconButton(onClick = {
+                    text = ""
+                    onSearch("")
+                }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = null

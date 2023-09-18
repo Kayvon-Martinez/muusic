@@ -25,7 +25,7 @@ object AppModule {
     fun provideMuusicBackendApi(): MuusicBackendApi {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("http://10.0.2.2:8080/api/v1/")
+            .baseUrl("http://192.168.1.157:8080/api/v1/")
             .build()
             .create(MuusicBackendApi::class.java)
     }

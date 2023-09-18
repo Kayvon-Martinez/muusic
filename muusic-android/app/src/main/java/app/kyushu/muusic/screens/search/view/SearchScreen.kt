@@ -16,7 +16,7 @@ import app.kyushu.muusic.data.remote.muusicBackend.responses.Artist
 import app.kyushu.muusic.data.remote.muusicBackend.responses.Source
 import app.kyushu.muusic.data.remote.muusicBackend.responses.TagDetails
 import app.kyushu.muusic.data.remote.muusicBackend.responses.Track
-import app.kyushu.muusic.screens.search.composables.RecentlyPlayedItems
+import app.kyushu.muusic.screens.search.composables.Category
 import app.kyushu.muusic.screens.search.composables.SearchBar
 import app.kyushu.muusic.screens.search.composables.TopTags
 import app.kyushu.muusic.screens.search.viewModel.SearchViewModel
@@ -108,10 +108,14 @@ object SearchScreen: AndroidScreen() {
                     Spacer(modifier = Modifier.padding(12.dp))
                     TopTags(tags = tags)
                     Spacer(modifier = Modifier.padding(12.dp))
-                    RecentlyPlayedItems(items = items)
+                    Category(categoryName = "Recently Played", items = items)
                 } else {
                     Spacer(modifier = Modifier.padding(12.dp))
-                    RecentlyPlayedItems(items = viewModel.searchResults.value!!.artists)
+                    Category(categoryName = "Artists", items = viewModel.searchResults.value!!.artists)
+                    Spacer(modifier = Modifier.padding(12.dp))
+                    Category(categoryName = "Albums", items = viewModel.searchResults.value!!.albums)
+                    Spacer(modifier = Modifier.padding(12.dp))
+                    Category(categoryName = "Tracks", items = viewModel.searchResults.value!!.tracks)
                 }
             }
         }
